@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <!-- Achtergrond -->
+    <rect width="1024" height="1024" fill="#007AFF"/>
+    
+    <!-- Pijl -->
+    <path d="M512 256 L768 512 L512 768 L512 512 L256 512 L512 256" 
+          fill="white" 
+          stroke="white" 
+          stroke-width="32"/>
+</svg> 

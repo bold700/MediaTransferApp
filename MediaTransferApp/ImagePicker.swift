@@ -6,7 +6,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     typealias UIViewControllerType = UINavigationController
     
     @Binding var selectedAssets: [PHAsset]
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) private var presentationMode
     
     func makeUIViewController(context: Context) -> UINavigationController {
         let imagePicker = CustomImagePickerController()
@@ -46,30 +46,116 @@ class CustomImagePickerController: UIViewController {
     private var assets: PHFetchResult<PHAsset>!
     private var panGesture: UIPanGestureRecognizer!
     private var selectionLabel: UILabel!
+    private var filterButton: UIButton!
+    private var lastSelectedIndexPath: IndexPath?
+    private var isSelecting = false
+    
+    enum FilterType {
+        case allItems
+        case favorites
+        case photos
+        case videos
+        case screenshots
+        
+        var title: String {
+            switch self {
+            case .allItems: return "All Items"
+            case .favorites: return "Favorites"
+            case .photos: return "Photos"
+            case .videos: return "Videos"
+            case .screenshots: return "Screenshots"
+            }
+        }
+        
+        var predicate: NSPredicate? {
+            switch self {
+            case .allItems:
+                return nil
+            case .favorites:
+                return NSPredicate(format: "favorite == YES")
+            case .photos:
+                return NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue)
+            case .videos:
+                return NSPredicate(format: "mediaType == %d", PHAssetMediaType.video.rawValue)
+            case .screenshots:
+                return NSPredicate(format: "(mediaSubtype & %d) != 0", PHAssetMediaSubtype.photoScreenshot.rawValue)
+            }
+        }
+    }
+    
+    private var currentFilter: FilterType = .allItems {
+        didSet {
+            loadAssets()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupGestures()
         loadAssets()
+    }
+    
+    private func setupGestures() {
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        panGesture.delegate = self
+        collectionView.addGestureRecognizer(panGesture)
+    }
+    
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        let location = gesture.location(in: collectionView)
+        
+        switch gesture.state {
+        case .began:
+            if let indexPath = collectionView.indexPathForItem(at: location) {
+                lastSelectedIndexPath = indexPath
+                isSelecting = !(collectionView.indexPathsForSelectedItems?.contains(indexPath) == true)
+                toggleSelection(at: indexPath)
+            }
+            
+        case .changed:
+            if let indexPath = collectionView.indexPathForItem(at: location),
+               indexPath != lastSelectedIndexPath {
+                lastSelectedIndexPath = indexPath
+                toggleSelection(at: indexPath)
+            }
+            
+        case .ended, .cancelled:
+            lastSelectedIndexPath = nil
+            isSelecting = false
+            
+        default:
+            break
+        }
+    }
+    
+    private func toggleSelection(at indexPath: IndexPath) {
+        if isSelecting {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+        } else {
+            collectionView.deselectItem(at: indexPath, animated: false)
+        }
+        updateSelectionCount()
     }
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // Maak een layout voor de collection view
+        // Create filter button
+        filterButton = UIButton(type: .system)
+        let filterImage = UIImage(systemName: "line.3.horizontal.decrease.circle")
+        filterButton.setImage(filterImage, for: .normal)
+        filterButton.showsMenuAsPrimaryAction = true
+        filterButton.menu = createFilterMenu()
+        
+        // Create collection view layout
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
         
-        // Bereken de cell grootte
-        let screenWidth = UIScreen.main.bounds.width
-        let numberOfItemsPerRow: CGFloat = 5
-        let spacing: CGFloat = 1
-        let totalSpacing = (numberOfItemsPerRow - 1) * spacing
-        let width = floor((screenWidth - totalSpacing) / numberOfItemsPerRow)
-        layout.itemSize = CGSize(width: width, height: width)
+        updateLayoutForCurrentOrientation(layout)
         
-        // Maak de collection view
+        // Create collection view
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.backgroundColor = .systemBackground
         collectionView.delegate = self
@@ -77,58 +163,99 @@ class CustomImagePickerController: UIViewController {
         collectionView.allowsMultipleSelection = true
         collectionView.register(ImageCell.self, forCellWithReuseIdentifier: "ImageCell")
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.addSubview(collectionView)
         
-        // Voeg knoppen toe aan de navigatiebalk
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "Annuleren",
-            style: .plain,
-            target: self,
-            action: #selector(cancelTapped)
-        )
-        
+        // Add navigation bar buttons
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Gereed",
+            title: "Done",
             style: .done,
             target: self,
             action: #selector(doneTapped)
         )
         
-        // Voeg de toolbar toe met Selecteer alles en Deselecteer knoppen
-        let selectAllButton = UIBarButtonItem(
-            title: "Selecteer alles",
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Cancel",
             style: .plain,
             target: self,
-            action: #selector(selectAllTapped)
+            action: #selector(cancelTapped)
         )
         
-        let deselectButton = UIBarButtonItem(
-            title: "Deselecteer",
-            style: .plain,
-            target: self,
-            action: #selector(deselectAllTapped)
-        )
+        view.addSubview(collectionView)
         
-        // Maak het label voor het aantal geselecteerde items
+        // Add toolbar with filter button and selection count
         selectionLabel = UILabel()
         selectionLabel.textAlignment = .center
         selectionLabel.font = .systemFont(ofSize: 17)
-        selectionLabel.text = "Geen foto's geselecteerd"
+        selectionLabel.text = "No media selected"
         let labelItem = UIBarButtonItem(customView: selectionLabel)
         
+        let filterBarButton = UIBarButtonItem(customView: filterButton)
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbarItems = [selectAllButton, flexSpace, labelItem, flexSpace, deselectButton]
+        toolbarItems = [filterBarButton, flexSpace, labelItem, flexSpace]
         navigationController?.setToolbarHidden(false, animated: false)
+        
+        // Register for orientation changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(orientationDidChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
+    
+    private func createFilterMenu() -> UIMenu {
+        let filters: [FilterType] = [
+            .allItems,
+            .favorites,
+            .photos,
+            .videos,
+            .screenshots
+        ]
+        
+        let actions = filters.map { filter in
+            UIAction(title: filter.title, state: currentFilter == filter ? .on : .off) { [weak self] _ in
+                self?.currentFilter = filter
+                self?.filterButton.menu = self?.createFilterMenu()
+            }
+        }
+        
+        return UIMenu(title: "", options: .displayInline, children: actions)
+    }
+    
+    private func updateLayoutForCurrentOrientation(_ layout: UICollectionViewFlowLayout) {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        let isLandscape = screenWidth > screenHeight
+        
+        // Bepaal het aantal items per rij op basis van de oriëntatie
+        let numberOfItemsPerRow: CGFloat = isLandscape ? 6 : 4
+        let spacing: CGFloat = 1
+        let totalSpacing = (numberOfItemsPerRow - 1) * spacing
+        let width = floor((screenWidth - totalSpacing) / numberOfItemsPerRow)
+        layout.itemSize = CGSize(width: width, height: width)
+    }
+    
+    @objc private func orientationDidChange() {
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        updateLayoutForCurrentOrientation(layout)
+        layout.invalidateLayout()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func loadAssets() {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        // Haal alle assets op (foto's en video's)
-        assets = PHAsset.fetchAssets(with: fetchOptions)
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        
+        if let predicate = currentFilter.predicate {
+            options.predicate = predicate
+        }
+        
+        assets = PHAsset.fetchAssets(with: options)
         collectionView.reloadData()
         
-        // Selecteer eerder geselecteerde items
+        // Reselect visible items that were previously selected
         for asset in selectedAssets {
             let index = assets.index(of: asset)
             if index != NSNotFound {
@@ -137,8 +264,7 @@ class CustomImagePickerController: UIViewController {
             }
         }
         
-        // Update het label met het totaal aantal items
-        updateSelectionCount()
+        updateSelectionLabel()
     }
     
     @objc private func cancelTapped() {
@@ -146,50 +272,52 @@ class CustomImagePickerController: UIViewController {
     }
     
     @objc private func doneTapped() {
+        // Get newly selected items from current view
         let selectedIndexPaths = collectionView.indexPathsForSelectedItems ?? []
-        let selectedAssets = selectedIndexPaths.map { assets.object(at: $0.item) }
+        let currentlySelectedAssets = selectedIndexPaths.map { assets.object(at: $0.item) }
+        
+        // Add newly selected items to existing selection if they're not already included
+        for asset in currentlySelectedAssets {
+            if !selectedAssets.contains(asset) {
+                selectedAssets.append(asset)
+            }
+        }
+        
         delegate?.imagePickerDidFinish(with: selectedAssets)
     }
     
-    @objc private func selectAllTapped() {
-        guard let assets = assets else { return }
-        for i in 0..<assets.count {
-            let indexPath = IndexPath(item: i, section: 0)
-            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-        }
-        updateSelectionCount()
-    }
-    
-    @objc private func deselectAllTapped() {
-        guard let assets = assets else { return }
-        for i in 0..<assets.count {
-            let indexPath = IndexPath(item: i, section: 0)
-            collectionView.deselectItem(at: indexPath, animated: false)
-        }
-        updateSelectionCount()
-    }
-    
-    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
-        // Implementeer de logica voor het afhandelen van de pan gesture
-    }
-    
-    func updateSelectionCount() {
-        guard let collectionView = collectionView,
-              let selectionLabel = selectionLabel,
-              let assets = assets else { return }
-        
-        let selectedCount = collectionView.indexPathsForSelectedItems?.count ?? 0
-        let totalCount = assets.count
-        
-        // Tel het aantal foto's en video's
+    private func updateSelectionCount() {
+        // Add newly selected items to selectedAssets
         let selectedIndexPaths = collectionView.indexPathsForSelectedItems ?? []
-        let selectedPhotos = selectedIndexPaths.filter { assets.object(at: $0.item).mediaType == .image }.count
-        let selectedVideos = selectedIndexPaths.filter { assets.object(at: $0.item).mediaType == .video }.count
+        let currentlySelectedAssets = Set(selectedIndexPaths.map { assets.object(at: $0.item) })
         
-        if selectedCount > 0 {
-            selectionLabel.text = "\(selectedPhotos) foto's, \(selectedVideos) video's"
+        // Remove deselected items that are visible in current filter
+        let visibleAssets = Set((0..<assets.count).map { assets.object(at: $0) })
+        selectedAssets.removeAll { asset in
+            if visibleAssets.contains(asset) {
+                return !currentlySelectedAssets.contains(asset)
+            }
+            return false
+        }
+        
+        // Add newly selected items
+        for asset in currentlySelectedAssets {
+            if !selectedAssets.contains(asset) {
+                selectedAssets.append(asset)
+            }
+        }
+        
+        updateSelectionLabel()
+    }
+    
+    private func updateSelectionLabel() {
+        let selectedPhotos = selectedAssets.filter { $0.mediaType == .image }.count
+        let selectedVideos = selectedAssets.filter { $0.mediaType == .video }.count
+        
+        if selectedPhotos > 0 || selectedVideos > 0 {
+            selectionLabel.text = "\(selectedPhotos) photos, \(selectedVideos) videos"
         } else {
-            selectionLabel.text = "Geen media geselecteerd"
+            selectionLabel.text = "No media selected"
         }
     }
 }
@@ -344,5 +472,11 @@ class ImageCell: UICollectionViewCell {
         imageView.image = nil
         checkmarkView.isHidden = true
         videoIndicatorView.isHidden = true
+    }
+}
+
+extension CustomImagePickerController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 } 

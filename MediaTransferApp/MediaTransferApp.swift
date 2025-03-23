@@ -4,7 +4,9 @@ import SwiftUI
 struct MediaTransferApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                ContentView()
+            }
         }
     }
 } 
