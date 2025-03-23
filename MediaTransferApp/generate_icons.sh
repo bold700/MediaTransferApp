@@ -11,6 +11,7 @@ sizes=(
     "60x60"
     "76x76"
     "83.5x83.5"
+    "152x152"
     "1024x1024"
 )
 
@@ -31,6 +32,7 @@ mv temp_icons/Icon-40x40.png AppIcon.appiconset/Icon-40x40.png
 mv temp_icons/Icon-60x60.png AppIcon.appiconset/Icon-60x60.png
 mv temp_icons/Icon-76x76.png AppIcon.appiconset/Icon-76x76.png
 mv temp_icons/Icon-83.5x83.5.png AppIcon.appiconset/Icon-83.5x83.5.png
+mv temp_icons/Icon-152x152.png AppIcon.appiconset/Icon-152x152.png
 mv temp_icons/Icon-1024x1024.png AppIcon.appiconset/Icon-1024x1024.png
 
 # Verwijder de tijdelijke directory

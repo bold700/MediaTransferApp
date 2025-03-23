@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		359BA6D32D90A84300C387B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 359BA6D22D90A84300C387B7 /* Assets.xcassets */; };
 		E1A1B8F02B9F1D0000C7D123 /* MediaTransferApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */; };
 		E1A1B8F22B9F1D0000C7D123 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */; };
 		E1A1B8F42B9F1D0100C7D123 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F32B9F1D0100C7D123 /* FileManager.swift */; };
@@ -14,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		359BA6D22D90A84300C387B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1A1B8EC2B9F1D0000C7D123 /* MediaTransferApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaTransferApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTransferApp.swift; sourceTree = "<group>"; };
 		E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 		E1A1B8EE2B9F1D0000C7D123 /* MediaTransferApp */ = {
 			isa = PBXGroup;
 			children = (
+				359BA6D22D90A84300C387B7 /* Assets.xcassets */,
 				E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */,
 				E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */,
 				E1A1B8F32B9F1D0100C7D123 /* FileManager.swift */,
@@ -119,6 +122,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359BA6D32D90A84300C387B7 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +267,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -296,6 +301,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
