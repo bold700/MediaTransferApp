@@ -1,44 +1,51 @@
-# Privacybeleid Media Transfer App
+# Privacy Policy Media Transfer App
 
-Ingangsdatum: [DATUM]
+Last updated: March 23, 2024
 
-## 1. Inleiding
+## Introduction
 
-Welkom bij het privacybeleid van de Media Transfer App. Dit beleid beschrijft hoe wij omgaan met uw persoonlijke gegevens wanneer u onze app gebruikt.
+Welcome to the privacy policy of the Media Transfer App. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we handle your data when you use our app.
 
-## 2. Gegevensverzameling en gebruik
+## Data Collection and Use
 
-### 2.1 Fotobibliotheek toegang
-- We vragen toegang tot uw fotobibliotheek om u in staat te stellen foto's en video's te selecteren voor overdracht
-- We slaan geen foto's of video's permanent op in de app
-- Geselecteerde media wordt alleen gebruikt voor de overdracht naar de door u gekozen locatie
+### What data we collect
 
-### 2.2 Opslag toegang
-- We vragen toegang tot door u geselecteerde opslaglocaties om media daar naartoe te kunnen kopiëren
-- We slaan geen informatie op over deze locaties na het sluiten van de app
+The Media Transfer App only collects and uses the following data:
+- Access to your photo library (only when you explicitly grant permission)
+- Access to external storage (USB devices you connect)
 
-## 3. Gegevensdeling
+### How we use this data
 
-We delen geen enkele persoonlijke informatie met derden. Alle mediabestanden blijven op uw apparaat of worden alleen gekopieerd naar door u geselecteerde locaties.
+- **Photo library access**: Is only used to select the media files you want to copy
+- **External storage access**: Is only used to copy the selected files to your external device
 
-## 4. Gegevensbeveiliging
+### Key points:
 
-We nemen de beveiliging van uw gegevens serieus:
-- Alle bestandsoverdrachten gebeuren lokaal op uw apparaat
-- We uploaden geen gegevens naar externe servers
-- We gebruiken geen tracking of analytics tools
+1. We do not store any personal data
+2. We do not share data with third parties
+3. We do not upload data to external servers
+4. All file transfers happen locally on your device
 
-## 5. Uw rechten
+## Data Storage
 
-U heeft het recht om:
-- Toegang tot uw fotobibliotheek op elk moment in te trekken via de iOS instellingen
-- De app en alle bijbehorende gegevens te verwijderen
+The app does not permanently store any personal data. All selected files are only temporarily used during the copying process.
 
-## 6. Updates van dit beleid
+## Your Rights
 
-We kunnen dit privacybeleid van tijd tot tijd bijwerken. We zullen u op de hoogte stellen van eventuele wijzigingen door de nieuwe versie in de App Store te publiceren.
+You have the right to:
+- Revoke access to your photo library at any time through iOS settings
+- Delete the app, which will remove all app-related data
 
-## 7. Contact
+## Changes to our Privacy Policy
 
-Als u vragen heeft over dit privacybeleid, kunt u contact met ons opnemen via:
-[CONTACTGEGEVENS] 
+We may update this privacy policy from time to time. Changes will be published here with an updated date.
+
+## Contact
+
+If you have any questions about this privacy policy, you can contact us at:
+- Email: support@bold700.com
+- Website: bold700.com
+
+## Consent
+
+By using the app, you agree to this privacy policy. You can stop using the app at any time if you do not agree with this policy. 
