@@ -173,50 +173,36 @@ struct ContentView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     headerView
+                        .padding(.top, 20)
                     
-                    if geometry.size.width > 600 {
-                        // Landscape layout voor grotere schermen
-                        HStack(alignment: .top, spacing: 20) {
-                            VStack(spacing: 20) {
-                                mediaSelectionButton
-                                directorySelectionButton
-                                transferButton
-                                deleteToggle
-                            }
-                            .frame(maxWidth: Constants.maxButtonWidth)
-                            
-                            if !selectedAssets.isEmpty {
-                                selectedAssetsListView
-                                    .frame(maxWidth: .infinity)
-                            }
+                    VStack(spacing: 20) {
+                        mediaSelectionButton
+                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                        if !selectedAssets.isEmpty {
+                            selectedAssetsListView
+                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
                         }
-                        .padding(.horizontal)
-                    } else {
-                        // Portrait layout voor kleinere schermen
-                        VStack(spacing: 20) {
-                            mediaSelectionButton
-                                .frame(maxWidth: Constants.maxButtonWidth)
-                            if !selectedAssets.isEmpty {
-                                selectedAssetsListView
-                            }
-                            directorySelectionButton
-                                .frame(maxWidth: Constants.maxButtonWidth)
-                            transferButton
-                                .frame(maxWidth: Constants.maxButtonWidth)
-                            deleteToggle
-                                .frame(maxWidth: Constants.maxButtonWidth)
-                        }
-                        .padding(.horizontal)
+                        directorySelectionButton
+                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                        transferButton
+                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                        deleteToggle
+                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
                     }
+                    .padding(.horizontal)
                     
                     if isTransferring {
                         transferProgressView
-                            .frame(maxWidth: Constants.maxButtonWidth)
+                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            .padding(.horizontal)
                     }
+                    
+                    Spacer(minLength: 20)
                 }
                 .frame(minHeight: geometry.size.height)
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(selectedAssets: $selectedAssets)
         }

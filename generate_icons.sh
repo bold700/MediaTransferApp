@@ -1,27 +1,30 @@
 #!/bin/bash
 
-# Ga naar de juiste directory
-cd "$(dirname "$0")"
-
-# Definieer het pad naar de AppIcon.appiconset
-ICON_DIR="MediaTransferApp/Assets.xcassets/AppIcon.appiconset"
-
-# Maak een tijdelijke directory
+# Maak directories aan voor de iconen
+mkdir -p AppIcon.appiconset
 mkdir -p temp_icons
 
-# Converteer SVG naar een grote PNG voor gebruik als bron
-magick "$ICON_DIR/icon.svg" -resize 1024x1024 -background none -flatten temp_icons/Icon-1024.png
+# Kopieer het basis icoon
+cp MediaTransferApp/icon_1024.svg temp_icons/Icon-1024.svg
 
-# Array met alle benodigde formaten
-declare -a SIZES=(20 29 40 58 60 76 80 87 120 152 167 180 1024)
+# Converteer SVG naar PNG zonder alpha channel
+sips -s format png temp_icons/Icon-1024.svg --out temp_icons/Icon-1024.png
+sips -s formatOptions png no-alpha temp_icons/Icon-1024.png --out temp_icons/Icon-1024.png
 
-# Genereer alle formaten met exacte afmetingen
-for size in "${SIZES[@]}"; do
-    echo "Generating ${size}x${size} icon..."
-    magick temp_icons/Icon-1024.png -resize "${size}x${size}^" -gravity center -extent "${size}x${size}" "$ICON_DIR/Icon-${size}.png"
+# Array met icon groottes
+sizes=("20x20" "29x29" "40x40" "58x58" "60x60" "76x76" "80x80" "87x87" "120x120" "152x152" "167x167" "180x180" "1024x1024")
+
+# Genereer iconen voor elke grootte
+for size in "${sizes[@]}"
+do
+    dimension="${size%x*}"
+    sips -z "$dimension" "$dimension" temp_icons/Icon-1024.png --out "temp_icons/$dimension.png"
 done
 
-# Verwijder de tijdelijke directory
+# Verplaats de gegenereerde iconen
+mv temp_icons/*.png AppIcon.appiconset/
+
+# Ruim tijdelijke bestanden op
 rm -rf temp_icons
 
 echo "Alle app iconen zijn gegenereerd met exacte afmetingen!" 
