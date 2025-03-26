@@ -3,59 +3,34 @@ import Photos
 import PhotosUI
 
 struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var selectedAssets: [PHAsset]
+    typealias UIViewControllerType = UINavigationController
     
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var configuration = PHPickerConfiguration(photoLibrary: .shared())
-        configuration.filter = .any(of: [.images, .videos])
-        configuration.selectionLimit = 0 // No limit
-        configuration.preferredAssetRepresentationMode = .current
-        
-        // Configureer de layout voor iPad
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            configuration.preselectedAssetIdentifiers = selectedAssets.map { $0.localIdentifier }
-            // Gebruik een grotere kolombreedte op iPad
-            configuration.selection = .ordered
-        }
-        
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = context.coordinator
-        
-        // Pas de collection view layout aan voor iPad
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            if let collectionView = picker.view.subviews.first?.subviews.first as? UICollectionView {
-                let layout = UICollectionViewFlowLayout()
-                let spacing: CGFloat = 2
-                let width = (UIScreen.main.bounds.width - spacing * 5) / 4
-                layout.itemSize = CGSize(width: width, height: width)
-                layout.minimumInteritemSpacing = spacing
-                layout.minimumLineSpacing = spacing
-                collectionView.collectionViewLayout = layout
-            }
-        }
-        
-        return picker
+    @Binding var selectedAssets: [PHAsset]
+    @Environment(\.presentationMode) private var presentationMode
+    
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let imagePicker = CustomImagePickerController()
+        imagePicker.delegate = context.coordinator
+        imagePicker.selectedAssets = selectedAssets
+        return UINavigationController(rootViewController: imagePicker)
     }
     
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+    class Coordinator: NSObject, CustomImagePickerControllerDelegate {
         let parent: ImagePicker
         
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
         
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            let identifiers = results.compactMap(\.assetIdentifier)
-            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-            
-            parent.selectedAssets = (0..<fetchResult.count).compactMap { fetchResult.object(at: $0) }
-            picker.dismiss(animated: true)
+        func imagePickerDidFinish(with assets: [PHAsset]) {
+            parent.selectedAssets = assets
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
 }

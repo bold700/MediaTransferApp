@@ -12,6 +12,7 @@ private enum Constants {
     static let buttonOpacity: Double = 0.1
     static let minButtonWidth: CGFloat = 280
     static let maxButtonWidth: CGFloat = 500
+    static let appBlue = Color(red: 0.0, green: 0.478, blue: 1.0) // #007AFF
 }
 
 // MARK: - Transfer Service
@@ -244,7 +245,17 @@ struct ContentView: View {
     }
     
     private var mediaSelectionButton: some View {
-        Button(action: checkPhotoLibraryPermission) {
+        Button(action: {
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .authorized {
+                        showImagePicker = true
+                    } else {
+                        showPhotoPermissionAlert = true
+                    }
+                }
+            }
+        }) {
             HStack {
                 Image(systemName: "photo.on.rectangle")
                 Text("Select Media")
@@ -255,51 +266,45 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.blue.opacity(Constants.buttonOpacity))
-            .foregroundColor(.blue)
+            .background(Constants.appBlue.opacity(Constants.buttonOpacity))
+            .foregroundColor(Constants.appBlue)
             .overlay(
                 RoundedRectangle(cornerRadius: Constants.buttonCornerRadius)
-                    .stroke(Color.blue, lineWidth: Constants.buttonStrokeWidth)
+                    .stroke(Constants.appBlue, lineWidth: Constants.buttonStrokeWidth)
             )
             .cornerRadius(Constants.buttonCornerRadius)
         }
     }
     
     private var selectedAssetsListView: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(selectedAssets, id: \.localIdentifier) { asset in
-                    assetRow(for: asset)
+        VStack(alignment: .leading, spacing: 5) {
+            if selectedMediaCount.photos > 0 {
+                HStack {
+                    Image(systemName: "photo.fill")
+                        .foregroundColor(Constants.appBlue)
+                    Text("\(selectedMediaCount.photos) Photos")
+                        .foregroundColor(.primary)
                 }
             }
-            .padding(.vertical)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            if selectedMediaCount.videos > 0 {
+                HStack {
+                    Image(systemName: "video.fill")
+                        .foregroundColor(Constants.appBlue)
+                    Text("\(selectedMediaCount.videos) Videos")
+                        .foregroundColor(.primary)
+                }
+            }
         }
-        .frame(maxHeight: 200)
-        .background(Color.gray.opacity(Constants.buttonOpacity))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(UIColor.systemBackground).opacity(0.1))
         .cornerRadius(Constants.buttonCornerRadius)
     }
     
-    private func assetRow(for asset: PHAsset) -> some View {
-        HStack {
-            Image(systemName: asset.mediaType == .video ? "video.fill" : "photo.fill")
-                .foregroundColor(asset.mediaType == .video ? .red : .blue)
-            if asset.mediaType == .video {
-                Text(formatDuration(asset.duration))
-                    .foregroundColor(.secondary)
-                    .font(.caption)
-                    .frame(width: 50)
-            }
-            Text(asset.value(forKey: "filename") as? String ?? "Unknown")
-                .lineLimit(1)
-            Spacer()
-        }
-        .padding(.horizontal)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
     private var directorySelectionButton: some View {
-        Button(action: { showDirectoryPicker = true }) {
+        Button(action: {
+            showDirectoryPicker = true
+        }) {
             HStack {
                 Image(systemName: "folder.badge.plus")
                 Text("Save to...")
@@ -310,99 +315,74 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.blue.opacity(Constants.buttonOpacity))
-            .foregroundColor(.blue)
+            .background(Constants.appBlue.opacity(Constants.buttonOpacity))
+            .foregroundColor(Constants.appBlue)
             .overlay(
                 RoundedRectangle(cornerRadius: Constants.buttonCornerRadius)
-                    .stroke(Color.blue, lineWidth: Constants.buttonStrokeWidth)
+                    .stroke(Constants.appBlue, lineWidth: Constants.buttonStrokeWidth)
             )
             .cornerRadius(Constants.buttonCornerRadius)
         }
     }
     
     private var transferButton: some View {
-        Button(action: { startTransfer(shouldDelete: shouldDeleteAfterTransfer) }) {
+        Button(action: startTransfer) {
             HStack {
                 Image(systemName: "arrow.right.circle.fill")
                 Text("Start Transfer")
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background((selectedAssets.isEmpty || appState.selectedDirectory == nil) ? Color.gray : Color.green)
+            .background(canTransfer ? Constants.appBlue : Color.gray)
             .foregroundColor(.white)
             .cornerRadius(Constants.buttonCornerRadius)
         }
-        .disabled(selectedAssets.isEmpty || appState.selectedDirectory == nil)
+        .disabled(!canTransfer)
     }
     
     private var deleteToggle: some View {
         Toggle("Automatically delete after transfer", isOn: $shouldDeleteAfterTransfer)
             .padding(.horizontal)
+            .tint(Constants.appBlue)
     }
     
     private var transferProgressView: some View {
-        Group {
-            if isTransferring {
-                ProgressView(value: transferProgress) {
-                    Text("\(Int(transferProgress * 100))%")
-                        .font(.caption)
-                }
-                .padding()
-            }
+        VStack(spacing: 10) {
+            Text("Transferring...")
+            ProgressView(value: transferProgress)
+                .progressViewStyle(LinearProgressViewStyle(tint: Constants.appBlue))
+                .frame(height: 10)
+            Text("\(Int(transferProgress * 100))%")
+                .font(.caption)
         }
+        .padding()
+        .background(Constants.appBlue.opacity(0.05))
+        .cornerRadius(Constants.buttonCornerRadius)
     }
     
     // MARK: - Alert Views
-    @ViewBuilder
     private func transferCompletedAlert() -> some View {
         Button("OK") {
+            transferCompleted = false
             selectedAssets = []
-            transferProgress = 0
         }
     }
     
-    @ViewBuilder
     private func photoPermissionAlert() -> some View {
-        Button("Open Settings", role: .none) {
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
+        Group {
+            Button("Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                showPhotoPermissionAlert = false
             }
         }
-        Button("Cancel", role: .cancel) {}
     }
     
     // MARK: - Helper Functions
-    private func checkPhotoLibraryPermission() {
-        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        
-        switch status {
-        case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                DispatchQueue.main.async {
-                    handlePhotoAuthorizationStatus(status)
-                }
-            }
-        case .restricted, .denied, .limited:
-            showPhotoPermissionAlert = true
-        case .authorized:
-            showImagePicker = true
-        @unknown default:
-            showPhotoPermissionAlert = true
-        }
-    }
-    
-    private func handlePhotoAuthorizationStatus(_ status: PHAuthorizationStatus) {
-        switch status {
-        case .authorized:
-            showImagePicker = true
-        case .limited:
-            showPhotoPermissionAlert = true
-        default:
-            showPhotoPermissionAlert = true
-        }
-    }
-    
-    private func startTransfer(shouldDelete: Bool) {
+    private func startTransfer() {
         guard let destinationURL = appState.selectedDirectory else { return }
         
         // Request access before starting transfer
@@ -418,7 +398,7 @@ struct ContentView: View {
         TransferService.transfer(
             assets: selectedAssets,
             to: destinationURL,
-            shouldDelete: shouldDelete,
+            shouldDelete: shouldDeleteAfterTransfer,
             progressHandler: { progress in
                 self.transferProgress = progress
             },
@@ -435,10 +415,8 @@ struct ContentView: View {
         )
     }
     
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let minutes = Int(duration) / 60
-        let seconds = Int(duration) % 60
-        return String(format: "%d:%02d", minutes, seconds)
+    private var canTransfer: Bool {
+        !selectedAssets.isEmpty && appState.selectedDirectory != nil
     }
 }
 

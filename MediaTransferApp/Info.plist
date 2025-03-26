@@ -53,7 +53,7 @@
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
+	<string>Automatic</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 </dict>

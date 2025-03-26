@@ -49,3 +49,8 @@ If you have any questions about this privacy policy, you can contact us at:
 ## Consent
 
 By using the app, you agree to this privacy policy. You can stop using the app at any time if you do not agree with this policy. 
+
+┌────────────────────────────┐
+│ 📁 Save to...             │
+│    Selected Folder Name    │
+└────────────────────────────┘ 
