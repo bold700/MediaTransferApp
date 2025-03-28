@@ -35,4 +35,6 @@
 "photo_access_denied" = "Photo library access is required to select photos and videos. Please enable it in Settings.";
 "settings" = "Settings";
 "transferring" = "Transferring...";
-"error_copying_file" = "Error copying file: %@"; 
+"error_copying_file" = "Error copying file: %@";
+"error_loading_image" = "Could not load the image";
+"error_converting_jpeg" = "Could not convert the image to JPEG"; 

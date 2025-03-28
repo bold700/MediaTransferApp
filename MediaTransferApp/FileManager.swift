@@ -48,7 +48,7 @@ extension FileManager {
         ) { image, info in
             guard let image = image,
                   let data = image.jpegData(compressionQuality: 1.0) else {
-                completion(.failure(NSError(domain: "MediaTransferApp", code: -1, userInfo: [NSLocalizedDescriptionKey: "Kon afbeelding niet laden"])))
+                completion(.failure(NSError(domain: "MediaTransferApp", code: -1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_loading_image", comment: "Error when image cannot be loaded")])))
                 return
             }
             
@@ -87,7 +87,7 @@ extension FileManager {
             ) { image, info in
                 guard let image = image,
                       let data = image.jpegData(compressionQuality: 1.0) else {
-                    errors.append(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Kon de afbeelding niet laden"]))
+                    errors.append(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_loading_image", comment: "Error when image cannot be loaded")])))
                     group.leave()
                     return
                 }
@@ -132,12 +132,12 @@ extension FileManager {
             options: options
         ) { image, info in
             guard let image = image else {
-                completion(.failure(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Kon de afbeelding niet laden"])))
+                completion(.failure(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_loading_image", comment: "Error when image cannot be loaded")])))
                 return
             }
             
             guard let data = image.jpegData(compressionQuality: 1.0) else {
-                completion(.failure(NSError(domain: "MediaTransfer", code: -2, userInfo: [NSLocalizedDescriptionKey: "Kon de afbeelding niet converteren naar JPEG"])))
+                completion(.failure(NSError(domain: "MediaTransfer", code: -2, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_converting_jpeg", comment: "Error when image cannot be converted to JPEG")])))
                 return
             }
             

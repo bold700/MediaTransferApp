@@ -35,4 +35,6 @@
 "photo_access_denied" = "Toegang tot de fotobibliotheek is vereist om foto's en video's te selecteren. Schakel dit in bij Instellingen.";
 "settings" = "Instellingen";
 "transferring" = "Bezig met overzetten...";
-"error_copying_file" = "Fout bij kopiëren van bestand: %@"; 
+"error_copying_file" = "Fout bij kopiëren van bestand: %@";
+"error_loading_image" = "Kon de afbeelding niet laden";
+"error_converting_jpeg" = "Kon de afbeelding niet converteren naar JPEG"; 
