@@ -87,7 +87,7 @@ extension FileManager {
             ) { image, info in
                 guard let image = image,
                       let data = image.jpegData(compressionQuality: 1.0) else {
-                    errors.append(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_loading_image", comment: "Error when image cannot be loaded")])))
+                    errors.append(NSError(domain: "MediaTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("error_loading_image", comment: "Error when image cannot be loaded")]))
                     group.leave()
                     return
                 }
