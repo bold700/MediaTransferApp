@@ -4,7 +4,7 @@ import UIKit
 @main
 struct MediaTransferApp: App {
     init() {
-        // Zorg ervoor dat de app altijd in fullscreen mode start
+        // Ensure the app always starts in fullscreen mode
         if UIDevice.current.userInterfaceIdiom == .pad {
             UIApplication.shared.delegate?.window??.overrideUserInterfaceStyle = .light
         }

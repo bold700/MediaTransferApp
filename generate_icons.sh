@@ -1,30 +1,31 @@
 #!/bin/bash
 
-# Maak directories aan voor de iconen
-mkdir -p AppIcon.appiconset
-mkdir -p temp_icons
+# Create directories for icons
+mkdir -p icons/temp
 
-# Kopieer het basis icoon
-cp MediaTransferApp/icon_1024.svg temp_icons/Icon-1024.svg
+# Copy the base icon
+cp icon.svg icons/temp/
 
-# Converteer SVG naar PNG zonder alpha channel
-sips -s format png temp_icons/Icon-1024.svg --out temp_icons/Icon-1024.png
-sips -s formatOptions png no-alpha temp_icons/Icon-1024.png --out temp_icons/Icon-1024.png
-
-# Array met icon groottes
-sizes=("20x20" "29x29" "40x40" "58x58" "60x60" "76x76" "80x80" "87x87" "120x120" "152x152" "167x167" "180x180" "1024x1024")
-
-# Genereer iconen voor elke grootte
-for size in "${sizes[@]}"
-do
-    dimension="${size%x*}"
-    sips -z "$dimension" "$dimension" temp_icons/Icon-1024.png --out "temp_icons/$dimension.png"
+# Convert SVG to PNG without alpha channel
+for size in 20 29 40 60 76 83.5 1024; do
+    inkscape -w ${size} -h ${size} icons/temp/icon.svg -o icons/temp/icon_${size}.png
+    convert icons/temp/icon_${size}.png -alpha off icons/temp/icon_${size}.png
 done
 
-# Verplaats de gegenereerde iconen
-mv temp_icons/*.png AppIcon.appiconset/
+# Generate icons for each size
+for size in 20 29 40 60 76 83.5 1024; do
+    for scale in 1 2 3; do
+        if [ "$size" == "83.5" ] && [ "$scale" == "3" ]; then
+            continue
+        fi
+        if [ "$size" == "1024" ] && [ "$scale" != "1" ]; then
+            continue
+        fi
+        final_size=$(echo "$size * $scale" | bc)
+        cp icons/temp/icon_${size}.png "icons/icon_${size}@${scale}x.png"
+    done
+done
 
-# Ruim tijdelijke bestanden op
-rm -rf temp_icons
+rm -rf icons/temp
 
-echo "Alle app iconen zijn gegenereerd met exacte afmetingen!" 
+echo "All icons have been generated with exact dimensions!" 

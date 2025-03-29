@@ -27,7 +27,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to copy your selected photos and videos to USB drives or external hard drives. For example: you can select vacation photos and transfer them to a USB stick for backup. We do not store or share your media.</string>
+	<string>To copy your photos and videos to external storage devices</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

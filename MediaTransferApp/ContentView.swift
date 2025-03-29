@@ -239,17 +239,9 @@ struct ContentView: View {
     
     // MARK: - View Components
     private var headerView: some View {
-        VStack(spacing: 12) {
-            Text("Media Transfer")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            Text("To transfer your photos and videos to external storage, we need access to your photo library. We don't store or share any of your data.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
+        Text("Media Transfer")
+            .font(.largeTitle)
+            .fontWeight(.bold)
     }
     
     private var mediaSelectionButton: some View {

@@ -114,7 +114,7 @@ extension FileManager {
             if errors.isEmpty {
                 completion(.success(()))
             } else {
-                completion(.failure(errors[0])) // We geven alleen de eerste fout terug
+                completion(.failure(errors[0])) // Only returning the first error
             }
         }
     }

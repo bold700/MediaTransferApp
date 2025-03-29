@@ -1,40 +1,35 @@
 # Media Transfer App
 
-Een eenvoudige iOS-applicatie voor het kopiëren van mediabestanden naar een externe harde schijf via USB-C.
+A simple iOS application for copying media files to an external hard drive via USB-C.
 
-## Functionaliteiten
+## Features
 
-- Selecteer meerdere mediabestanden (afbeeldingen, video's, audio)
-- Kies een doelmap op een externe schijf
-- Kopieer bestanden met voortgangsindicator
-- Ondersteunt grote bestanden door chunk-gebaseerd kopiëren
-- Moderne SwiftUI interface
+- Select photos and videos from your photo library
+- Choose a destination folder on an external drive
+- Copy files with progress indicator
+- Option to automatically delete files after transfer
 
-## Vereisten
+## Requirements
 
-- iOS 15.0 of hoger
-- Xcode 14.0 of hoger
-- Een iOS-apparaat met USB-C aansluiting
+- iOS device with USB-C connection
+- External storage device (USB drive, hard drive)
+- iOS 17.0 or later
 
-## Installatie
+## Installation
 
-1. Clone deze repository
-2. Open `MediaTransferApp.xcodeproj` in Xcode
-3. Selecteer je iOS-apparaat als doel
-4. Build en run de applicatie
+1. Open the project in Xcode
+2. Build the project
+3. Select your iOS device as the target
+4. Run the app on your device
 
-## Gebruik
+## Usage
 
-1. Start de app
-2. Tik op "Selecteer Media" om bestanden te kiezen
-3. Tik op "Kies Bestemming" om de doelmap te selecteren
-4. Tik op "Start Kopiëren" om het kopieerproces te starten
-5. Volg de voortgang via de voortgangsbalk
+1. Connect your external storage device
+2. Tap "Select Media" to choose files
+3. Tap "Choose Destination" to select the target folder
+4. Tap "Start Transfer" to begin the copy process
+5. Monitor progress via the progress bar
 
-## Beveiliging
+## Privacy
 
-De app vraagt alleen toegang tot de specifiek geselecteerde bestanden en mappen. Er worden geen permanente toegangsrechten opgeslagen.
-
-## Licentie
-
-MIT License 
+The app only requests access to specifically selected files and folders. No permanent access rights are stored. 
