@@ -149,6 +149,45 @@ final class AppState: ObservableObject {
     }
 }
 
+// MARK: - Splash Screen
+private struct SplashScreen: View {
+    @State private var isRotating = false
+    @Binding var isFinished: Bool
+    
+    var body: some View {
+        ZStack {
+            Constants.appBlue
+                .ignoresSafeArea()
+            
+            VStack(spacing: 11) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 124, height: 124)
+                    .foregroundColor(.white)
+                    .rotationEffect(.degrees(isRotating ? 360 : 0))
+                
+                Text("Media Transfer App")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+            }
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                isRotating = true
+            }
+            
+            // After 2 seconds, transition to the main app
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                withAnimation {
+                    isFinished = false
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Content View
 struct ContentView: View {
     @StateObject private var appState = AppState()
@@ -161,7 +200,7 @@ struct ContentView: View {
     @State private var transferCompleted = false
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var showPhotoPermissionAlert = false
+    @State private var showSplashScreen = true
     
     private var selectedMediaCount: (photos: Int, videos: Int) {
         let photos = selectedAssets.filter { $0.mediaType == .image }.count
@@ -170,14 +209,27 @@ struct ContentView: View {
     }
     
     var body: some View {
+        ZStack {
+            if !showSplashScreen {
+                mainView
+            } else {
+                SplashScreen(isFinished: $showSplashScreen)
+            }
+        }
+    }
+    
+    private var mainView: some View {
         GeometryReader { geometry in
             NavigationView {
                 ScrollView {
                     VStack(spacing: 20) {
-                        headerView
-                            .padding(.top, 20)
+                        Spacer()
                         
                         VStack(spacing: 20) {
+                            headerView
+                                .padding(.top, 20)
+                                .padding(.bottom, 16)
+                            
                             mediaSelectionButton
                                 .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
                             if !selectedAssets.isEmpty {
@@ -190,50 +242,45 @@ struct ContentView: View {
                                 .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
                             deleteToggle
                                 .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            
+                            if isTransferring {
+                                transferProgressView
+                                    .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            }
                         }
                         .padding(.horizontal)
                         
-                        if isTransferring {
-                            transferProgressView
-                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                                .padding(.horizontal)
-                        }
-                        
-                        Spacer(minLength: 20)
+                        Spacer()
                     }
                     .frame(minHeight: geometry.size.height)
+                    .frame(maxWidth: .infinity)
                 }
             }
             .navigationViewStyle(StackNavigationViewStyle())
-            .sheet(isPresented: $showImagePicker) {
-                ImagePicker(selectedAssets: $selectedAssets)
-            }
-            .fileImporter(
-                isPresented: $showDirectoryPicker,
-                allowedContentTypes: [.folder],
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    if let url = urls.first {
-                        // Stop accessing previous URL if any
-                        if let oldURL = appState.selectedDirectory {
-                            oldURL.stopAccessingSecurityScopedResource()
-                        }
-                        appState.selectedDirectory = url
-                    }
-                case .failure(let error):
-                    errorMessage = error.localizedDescription
-                    showError = true
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedAssets: $selectedAssets)
+        }
+        .fileImporter(
+            isPresented: $showDirectoryPicker,
+            allowedContentTypes: [.folder],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    appState.selectedDirectory = url
                 }
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+                showError = true
             }
-            .alert("Transfer completed", isPresented: $transferCompleted, actions: transferCompletedAlert)
-            .alert("Error", isPresented: $showError) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(errorMessage)
-            }
-            .alert("Photo Access", isPresented: $showPhotoPermissionAlert, actions: photoPermissionAlert)
+        }
+        .alert("Transfer completed", isPresented: $transferCompleted, actions: transferCompletedAlert)
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -246,12 +293,10 @@ struct ContentView: View {
     
     private var mediaSelectionButton: some View {
         Button(action: {
-            PHPhotoLibrary.requestAuthorization { status in
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
                 DispatchQueue.main.async {
-                    if status == .authorized {
+                    if status == .authorized || status == .limited {
                         showImagePicker = true
-                    } else {
-                        showPhotoPermissionAlert = true
                     }
                 }
             }
@@ -365,19 +410,6 @@ struct ContentView: View {
         Button("OK") {
             transferCompleted = false
             selectedAssets = []
-        }
-    }
-    
-    private func photoPermissionAlert() -> some View {
-        Group {
-            Button("Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                showPhotoPermissionAlert = false
-            }
         }
     }
     
