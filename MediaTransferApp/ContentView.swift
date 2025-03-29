@@ -171,77 +171,85 @@ struct ContentView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 20) {
-                    headerView
-                        .padding(.top, 20)
-                    
+            NavigationView {
+                ScrollView {
                     VStack(spacing: 20) {
-                        mediaSelectionButton
-                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                        if !selectedAssets.isEmpty {
-                            selectedAssetsListView
+                        headerView
+                            .padding(.top, 20)
+                        
+                        VStack(spacing: 20) {
+                            mediaSelectionButton
+                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            if !selectedAssets.isEmpty {
+                                selectedAssetsListView
+                                    .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            }
+                            directorySelectionButton
+                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            transferButton
+                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                            deleteToggle
                                 .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
                         }
-                        directorySelectionButton
-                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                        transferButton
-                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                        deleteToggle
-                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                        .padding(.horizontal)
+                        
+                        if isTransferring {
+                            transferProgressView
+                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
+                                .padding(.horizontal)
+                        }
+                        
+                        Spacer(minLength: 20)
                     }
-                    .padding(.horizontal)
-                    
-                    if isTransferring {
-                        transferProgressView
-                            .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            .padding(.horizontal)
-                    }
-                    
-                    Spacer(minLength: 20)
+                    .frame(minHeight: geometry.size.height)
                 }
-                .frame(minHeight: geometry.size.height)
             }
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedAssets: $selectedAssets)
-        }
-        .fileImporter(
-            isPresented: $showDirectoryPicker,
-            allowedContentTypes: [.folder],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    // Stop accessing previous URL if any
-                    if let oldURL = appState.selectedDirectory {
-                        oldURL.stopAccessingSecurityScopedResource()
+            .navigationViewStyle(StackNavigationViewStyle())
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(selectedAssets: $selectedAssets)
+            }
+            .fileImporter(
+                isPresented: $showDirectoryPicker,
+                allowedContentTypes: [.folder],
+                allowsMultipleSelection: false
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    if let url = urls.first {
+                        // Stop accessing previous URL if any
+                        if let oldURL = appState.selectedDirectory {
+                            oldURL.stopAccessingSecurityScopedResource()
+                        }
+                        appState.selectedDirectory = url
                     }
-                    appState.selectedDirectory = url
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
+                    showError = true
                 }
-            case .failure(let error):
-                errorMessage = error.localizedDescription
-                showError = true
             }
+            .alert("Transfer completed", isPresented: $transferCompleted, actions: transferCompletedAlert)
+            .alert("Error", isPresented: $showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
+            .alert("Photo Access", isPresented: $showPhotoPermissionAlert, actions: photoPermissionAlert)
         }
-        .alert("Transfer completed", isPresented: $transferCompleted, actions: transferCompletedAlert)
-        .alert("Error", isPresented: $showError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(errorMessage)
-        }
-        .alert("Photo Access", isPresented: $showPhotoPermissionAlert, actions: photoPermissionAlert)
     }
     
     // MARK: - View Components
     private var headerView: some View {
-        Text("Media Transfer")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 20)
+        VStack(spacing: 12) {
+            Text("Media Transfer")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            
+            Text("To transfer your photos and videos to external storage, we need access to your photo library. We don't store or share any of your data.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
     }
     
     private var mediaSelectionButton: some View {
