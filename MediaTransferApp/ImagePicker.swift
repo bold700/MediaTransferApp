@@ -148,6 +148,46 @@ class CustomImagePickerController: UIViewController {
         filterButton.showsMenuAsPrimaryAction = true
         filterButton.menu = createFilterMenu()
         
+        // Add toolbar with filter button and selection count
+        let selectionStackView = UIStackView(frame: CGRect(x: 0, y: 0, width: 150, height: 52))
+        selectionStackView.axis = .vertical
+        selectionStackView.alignment = .center
+        selectionStackView.distribution = .fillEqually
+        
+        let photosLabel = UILabel()
+        photosLabel.font = .systemFont(ofSize: 15)
+        photosLabel.textAlignment = .center
+        
+        let videosLabel = UILabel()
+        videosLabel.font = .systemFont(ofSize: 15)
+        videosLabel.textAlignment = .center
+        
+        selectionStackView.addArrangedSubview(photosLabel)
+        selectionStackView.addArrangedSubview(videosLabel)
+        
+        selectionLabel = photosLabel // Keep reference to update later
+        let labelItem = UIBarButtonItem(customView: selectionStackView)
+        
+        // Create selection button with fixed width
+        let selectionButton = UIButton(type: .system)
+        selectionButton.setTitle("Select All", for: .normal)
+        selectionButton.titleLabel?.adjustsFontSizeToFitWidth = false
+        selectionButton.frame = CGRect(x: 0, y: 0, width: 140, height: 44)
+        selectionButton.addTarget(self, action: #selector(selectionButtonTapped), for: .touchUpInside)
+        
+        let filterBarButton = UIBarButtonItem(customView: filterButton)
+        let selectionBarButton = UIBarButtonItem(customView: selectionButton)
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        
+        // Add spacing items for top/bottom padding
+        let topSpaceItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        topSpaceItem.width = 4
+        
+        toolbarItems = [topSpaceItem, filterBarButton, flexSpace, labelItem, flexSpace, selectionBarButton]
+        
+        navigationController?.setToolbarHidden(false, animated: false)
+        navigationController?.toolbar.backgroundColor = .systemBackground
+        
         // Create collection view layout
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 1
@@ -180,18 +220,6 @@ class CustomImagePickerController: UIViewController {
         )
         
         view.addSubview(collectionView)
-        
-        // Add toolbar with filter button and selection count
-        selectionLabel = UILabel()
-        selectionLabel.textAlignment = .center
-        selectionLabel.font = .systemFont(ofSize: 17)
-        selectionLabel.text = "No media selected"
-        let labelItem = UIBarButtonItem(customView: selectionLabel)
-        
-        let filterBarButton = UIBarButtonItem(customView: filterButton)
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbarItems = [filterBarButton, flexSpace, labelItem, flexSpace]
-        navigationController?.setToolbarHidden(false, animated: false)
         
         // Register for orientation changes
         NotificationCenter.default.addObserver(
@@ -308,17 +336,63 @@ class CustomImagePickerController: UIViewController {
         }
         
         updateSelectionLabel()
+        
+        // Update selection button title
+        if let selectionButton = toolbarItems?.last?.customView as? UIButton {
+            selectionButton.setTitle(
+                selectedIndexPaths.isEmpty ? "Select All" : "Deselect All",
+                for: .normal
+            )
+        }
     }
     
     private func updateSelectionLabel() {
         let selectedPhotos = selectedAssets.filter { $0.mediaType == .image }.count
         let selectedVideos = selectedAssets.filter { $0.mediaType == .video }.count
         
-        if selectedPhotos > 0 || selectedVideos > 0 {
-            selectionLabel.text = "\(selectedPhotos) photos, \(selectedVideos) videos"
-        } else {
-            selectionLabel.text = "No media selected"
+        if let stackView = selectionLabel.superview as? UIStackView,
+           let photosLabel = stackView.arrangedSubviews[0] as? UILabel,
+           let videosLabel = stackView.arrangedSubviews[1] as? UILabel {
+            
+            if selectedPhotos > 0 || selectedVideos > 0 {
+                photosLabel.text = "\(selectedPhotos) photos"
+                videosLabel.text = "\(selectedVideos) videos"
+            } else {
+                photosLabel.text = "No media"
+                videosLabel.text = "selected"
+            }
         }
+    }
+    
+    @objc private func selectionButtonTapped() {
+        if collectionView.indexPathsForSelectedItems?.isEmpty ?? true {
+            // Nothing selected - do Select All
+            selectAllTapped()
+            (toolbarItems?.last?.customView as? UIButton)?.setTitle("Deselect All", for: .normal)
+        } else {
+            // Something selected - do Deselect All
+            deselectAllTapped()
+            (toolbarItems?.last?.customView as? UIButton)?.setTitle("Select All", for: .normal)
+        }
+    }
+    
+    @objc private func selectAllTapped() {
+        let totalSections = collectionView.numberOfSections
+        for section in 0..<totalSections {
+            let totalItems = collectionView.numberOfItems(inSection: section)
+            for item in 0..<totalItems {
+                let indexPath = IndexPath(item: item, section: section)
+                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            }
+        }
+        updateSelectionCount()
+    }
+    
+    @objc private func deselectAllTapped() {
+        collectionView.indexPathsForSelectedItems?.forEach { indexPath in
+            collectionView.deselectItem(at: indexPath, animated: false)
+        }
+        updateSelectionCount()
     }
 }
 
