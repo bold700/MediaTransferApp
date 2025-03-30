@@ -38,6 +38,8 @@
     <string>Media Transfer requires access to the album to copy photos and videos to external storage devices.</string>
     <key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
     <true/>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
