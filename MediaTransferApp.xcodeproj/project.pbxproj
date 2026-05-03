@@ -8,18 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		359BA6D32D90A84300C387B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 359BA6D22D90A84300C387B7 /* Assets.xcassets */; };
+		7AB7C0012E66100100ABCD02 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 7AB7C0012E66100100ABCD01 /* Localizable.xcstrings */; };
 		E1A1B8F02B9F1D0000C7D123 /* MediaTransferApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */; };
 		E1A1B8F22B9F1D0000C7D123 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */; };
-		E1A1B8F42B9F1D0100C7D123 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F32B9F1D0100C7D123 /* FileManager.swift */; };
 		E1A1B8F62B9F1E0000C7D123 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F72B9F1E0000C7D123 /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		359BA6D22D90A84300C387B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7AB7C0012E66100100ABCD01 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E1A1B8EC2B9F1D0000C7D123 /* MediaTransferApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaTransferApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTransferApp.swift; sourceTree = "<group>"; };
 		E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E1A1B8F32B9F1D0100C7D123 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		E1A1B8F52B9F1D0100C7D123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1A1B8F72B9F1E0000C7D123 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,9 +55,9 @@
 			isa = PBXGroup;
 			children = (
 				359BA6D22D90A84300C387B7 /* Assets.xcassets */,
+				7AB7C0012E66100100ABCD01 /* Localizable.xcstrings */,
 				E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */,
 				E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */,
-				E1A1B8F32B9F1D0100C7D123 /* FileManager.swift */,
 				E1A1B8F72B9F1E0000C7D123 /* ImagePicker.swift */,
 				E1A1B8F52B9F1D0100C7D123 /* Info.plist */,
 			);
@@ -105,6 +105,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				nl,
 				Base,
 			);
 			mainGroup = E1A1B8E32B9F1D0000C7D123;
@@ -123,6 +124,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				359BA6D32D90A84300C387B7 /* Assets.xcassets in Resources */,
+				7AB7C0012E66100100ABCD02 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,7 +137,6 @@
 			files = (
 				E1A1B8F22B9F1D0000C7D123 /* ContentView.swift in Sources */,
 				E1A1B8F02B9F1D0000C7D123 /* MediaTransferApp.swift in Sources */,
-				E1A1B8F42B9F1D0100C7D123 /* FileManager.swift in Sources */,
 				E1A1B8F62B9F1E0000C7D123 /* ImagePicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -196,7 +197,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -254,7 +255,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -271,7 +272,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = YR94KX729G;
 				ENABLE_PREVIEWS = YES;
@@ -291,7 +292,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kennytimmer.mediatransfer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -307,7 +308,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = YR94KX729G;
 				ENABLE_PREVIEWS = YES;
@@ -327,7 +328,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kennytimmer.mediatransfer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
