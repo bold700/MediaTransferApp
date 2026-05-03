@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		359BA6D32D90A84300C387B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 359BA6D22D90A84300C387B7 /* Assets.xcassets */; };
 		7AB7C0012E66100100ABCD02 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 7AB7C0012E66100100ABCD01 /* Localizable.xcstrings */; };
+		7AB7C0022E66200000ABCD02 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB7C0022E66200000ABCD01 /* Services.swift */; };
+		7AB7C0022E66200000ABCD04 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB7C0022E66200000ABCD03 /* OnboardingView.swift */; };
+		7AB7C0022E66200000ABCD06 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB7C0022E66200000ABCD05 /* SettingsView.swift */; };
 		E1A1B8F02B9F1D0000C7D123 /* MediaTransferApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */; };
 		E1A1B8F22B9F1D0000C7D123 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */; };
 		E1A1B8F62B9F1E0000C7D123 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B8F72B9F1E0000C7D123 /* ImagePicker.swift */; };
@@ -17,6 +20,9 @@
 /* Begin PBXFileReference section */
 		359BA6D22D90A84300C387B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7AB7C0012E66100100ABCD01 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		7AB7C0022E66200000ABCD01 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
+		7AB7C0022E66200000ABCD03 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		7AB7C0022E66200000ABCD05 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E1A1B8EC2B9F1D0000C7D123 /* MediaTransferApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaTransferApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTransferApp.swift; sourceTree = "<group>"; };
 		E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,6 +65,9 @@
 				E1A1B8EF2B9F1D0000C7D123 /* MediaTransferApp.swift */,
 				E1A1B8F12B9F1D0000C7D123 /* ContentView.swift */,
 				E1A1B8F72B9F1E0000C7D123 /* ImagePicker.swift */,
+				7AB7C0022E66200000ABCD01 /* Services.swift */,
+				7AB7C0022E66200000ABCD03 /* OnboardingView.swift */,
+				7AB7C0022E66200000ABCD05 /* SettingsView.swift */,
 				E1A1B8F52B9F1D0100C7D123 /* Info.plist */,
 			);
 			path = MediaTransferApp;
@@ -138,6 +147,9 @@
 				E1A1B8F22B9F1D0000C7D123 /* ContentView.swift in Sources */,
 				E1A1B8F02B9F1D0000C7D123 /* MediaTransferApp.swift in Sources */,
 				E1A1B8F62B9F1E0000C7D123 /* ImagePicker.swift in Sources */,
+				7AB7C0022E66200000ABCD02 /* Services.swift in Sources */,
+				7AB7C0022E66200000ABCD04 /* OnboardingView.swift in Sources */,
+				7AB7C0022E66200000ABCD06 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

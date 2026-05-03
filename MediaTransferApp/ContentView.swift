@@ -2,6 +2,8 @@ import SwiftUI
 import Photos
 import UniformTypeIdentifiers
 import AVFoundation
+import UIKit
+import UserNotifications
 
 // MARK: - Constants
 private enum Constants {
@@ -31,6 +33,7 @@ final class TransferController: ObservableObject {
     @Published private(set) var total: Int = 0
 
     private var task: Task<Void, Never>?
+    private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
 
     func start(assets: [PHAsset], destination: URL, deleteAfter: Bool, onFinish: @escaping (Outcome) -> Void) {
         guard !isTransferring else { return }
@@ -40,10 +43,17 @@ final class TransferController: ObservableObject {
         total = assets.count
         currentFileName = ""
 
+        UIApplication.shared.isIdleTimerDisabled = true
+        beginBackgroundTask()
+        requestNotificationPermissionIfNeeded()
+
         task = Task { [weak self] in
             let result = await self?.run(assets: assets, destination: destination, deleteAfter: deleteAfter) ?? Outcome()
             self?.isTransferring = false
             self?.task = nil
+            UIApplication.shared.isIdleTimerDisabled = false
+            self?.endBackgroundTask()
+            self?.postCompletionNotificationIfBackgrounded(result)
             onFinish(result)
         }
     }
@@ -51,6 +61,51 @@ final class TransferController: ObservableObject {
     func cancel() {
         task?.cancel()
     }
+
+    private func beginBackgroundTask() {
+        endBackgroundTask()
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "MediaTransfer") { [weak self] in
+            self?.task?.cancel()
+            self?.endBackgroundTask()
+        }
+    }
+
+    private func endBackgroundTask() {
+        guard backgroundTaskID != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTaskID)
+        backgroundTaskID = .invalid
+    }
+
+    private func requestNotificationPermissionIfNeeded() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else { return }
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        }
+    }
+
+    private func postCompletionNotificationIfBackgrounded(_ outcome: Outcome) {
+        guard UIApplication.shared.applicationState != .active else { return }
+        let content = UNMutableNotificationContent()
+        if outcome.outOfSpace {
+            content.title = NSLocalizedString("Not enough space", comment: "")
+            content.body = String(format: NSLocalizedString("The destination doesn't have enough free space. %lld item(s) were copied before stopping.", comment: ""), outcome.succeeded)
+        } else if outcome.cancelled {
+            content.title = NSLocalizedString("Cancelled", comment: "")
+            content.body = String(format: NSLocalizedString("Transfer cancelled. %lld item(s) copied.", comment: ""), outcome.succeeded)
+        } else if !outcome.failed.isEmpty {
+            content.title = NSLocalizedString("Transfer completed with errors", comment: "")
+            content.body = String(format: NSLocalizedString("All %lld item(s) copied successfully.", comment: ""), outcome.succeeded)
+        } else {
+            content.title = NSLocalizedString("Transfer completed", comment: "")
+            content.body = String(format: NSLocalizedString("All %lld item(s) copied successfully.", comment: ""), outcome.succeeded)
+        }
+        content.sound = .default
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    private static let batchSize = 50
+    private static let batchPauseNanos: UInt64 = 200_000_000 // 200ms
 
     private func run(assets: [PHAsset], destination: URL, deleteAfter: Bool) async -> Outcome {
         var outcome = Outcome()
@@ -64,36 +119,57 @@ final class TransferController: ObservableObject {
         }
 
         var assetsToDelete: [PHAsset] = []
+        var globalIndex = 0
+        var stop = false
 
-        for (index, asset) in assets.enumerated() {
-            if Task.isCancelled {
-                outcome.cancelled = true
-                break
-            }
+        let batches = stride(from: 0, to: assets.count, by: Self.batchSize).map {
+            Array(assets[$0..<min($0 + Self.batchSize, assets.count)])
+        }
 
-            guard let sourceURL = await fileURL(for: asset) else {
-                outcome.failed.append("Item \(index + 1)")
-                completed = index + 1
+        for batch in batches {
+            if stop || Task.isCancelled { break }
+
+            for asset in batch {
+                if Task.isCancelled {
+                    outcome.cancelled = true
+                    stop = true
+                    break
+                }
+
+                guard let sourceURL = await fileURL(for: asset) else {
+                    outcome.failed.append("Item \(globalIndex + 1)")
+                    globalIndex += 1
+                    completed = globalIndex
+                    progress = Double(completed) / Double(max(total, 1))
+                    continue
+                }
+
+                let uniqueName = Self.uniqueFileName(at: destination, original: sourceURL.lastPathComponent)
+                currentFileName = uniqueName
+
+                do {
+                    try FileManager.default.copyItem(at: sourceURL, to: destination.appendingPathComponent(uniqueName))
+                    outcome.succeeded += 1
+                    if deleteAfter { assetsToDelete.append(asset) }
+                } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError {
+                    outcome.outOfSpace = true
+                    stop = true
+                    break
+                } catch {
+                    outcome.failed.append(sourceURL.lastPathComponent)
+                }
+
+                globalIndex += 1
+                completed = globalIndex
                 progress = Double(completed) / Double(max(total, 1))
-                continue
+
+                await Task.yield()
             }
 
-            let uniqueName = Self.uniqueFileName(at: destination, original: sourceURL.lastPathComponent)
-            currentFileName = uniqueName
-
-            do {
-                try FileManager.default.copyItem(at: sourceURL, to: destination.appendingPathComponent(uniqueName))
-                outcome.succeeded += 1
-                if deleteAfter { assetsToDelete.append(asset) }
-            } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError {
-                outcome.outOfSpace = true
-                break
-            } catch {
-                outcome.failed.append(sourceURL.lastPathComponent)
+            // Adempauze tussen batches zodat iOS Photos-service niet overweldigd raakt
+            if !stop && !Task.isCancelled && batch.count == Self.batchSize {
+                try? await Task.sleep(nanoseconds: Self.batchPauseNanos)
             }
-
-            completed = index + 1
-            progress = Double(completed) / Double(max(total, 1))
         }
 
         if deleteAfter && !assetsToDelete.isEmpty && !outcome.cancelled {
@@ -242,6 +318,9 @@ struct ContentView: View {
     @State private var resultAlert: ResultAlert?
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var showPhotoPermissionAlert = false
+    @State private var showSettings = false
+    @State private var hasSeenOnboarding: Bool = UserStats.hasSeenOnboarding
 
     private struct ResultAlert: Identifiable {
         let id = UUID()
@@ -260,6 +339,11 @@ struct ContentView: View {
         ZStack {
             if showSplashScreen {
                 SplashScreen(isVisible: $showSplashScreen)
+            } else if !hasSeenOnboarding {
+                OnboardingView {
+                    UserStats.hasSeenOnboarding = true
+                    withAnimation { hasSeenOnboarding = true }
+                }
             } else {
                 mainView
             }
@@ -303,10 +387,20 @@ struct ContentView: View {
                     .frame(minHeight: geometry.size.height)
                     .frame(maxWidth: .infinity)
                 }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: { showSettings = true }) {
+                            Image(systemName: "gear")
+                        }
+                    }
+                }
             }
         }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(selectedAssets: $selectedAssets)
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
         .fileImporter(
             isPresented: $showDirectoryPicker,
@@ -339,6 +433,16 @@ struct ContentView: View {
         } message: {
             Text(errorMessage)
         }
+        .alert("Photo access required", isPresented: $showPhotoPermissionAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("To select media, please allow Photo access in Settings.")
+        }
     }
 
     // MARK: - View Components
@@ -349,15 +453,7 @@ struct ContentView: View {
     }
 
     private var mediaSelectionButton: some View {
-        Button(action: {
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                DispatchQueue.main.async {
-                    if status == .authorized || status == .limited {
-                        showImagePicker = true
-                    }
-                }
-            }
-        }) {
+        Button(action: requestPhotoAccess) {
             HStack {
                 Image(systemName: "photo.on.rectangle")
                 Text("Select Media")
@@ -460,6 +556,14 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            HStack(spacing: 6) {
+                Image(systemName: "info.circle")
+                    .font(.caption2)
+                Text("Keep this app open until finished")
+                    .font(.caption2)
+            }
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
             ProgressView(value: transfer.progress)
                 .progressViewStyle(LinearProgressViewStyle(tint: Constants.appBlue))
                 .frame(height: 10)
@@ -490,6 +594,28 @@ struct ContentView: View {
     }
 
     // MARK: - Helper Functions
+    private func requestPhotoAccess() {
+        let current = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        switch current {
+        case .authorized, .limited:
+            showImagePicker = true
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                DispatchQueue.main.async {
+                    if status == .authorized || status == .limited {
+                        showImagePicker = true
+                    } else {
+                        showPhotoPermissionAlert = true
+                    }
+                }
+            }
+        case .denied, .restricted:
+            showPhotoPermissionAlert = true
+        @unknown default:
+            showPhotoPermissionAlert = true
+        }
+    }
+
     private func startTransfer() {
         guard let destinationURL = appState.selectedDirectory else { return }
 
@@ -504,7 +630,13 @@ struct ContentView: View {
             destination: destinationURL,
             deleteAfter: shouldDeleteAfterTransfer
         ) { outcome in
+            if outcome.succeeded > 0 {
+                UserStats.recordTransfer(succeededItems: outcome.succeeded)
+            }
             self.resultAlert = makeAlert(for: outcome)
+            if outcome.failed.isEmpty && !outcome.cancelled && !outcome.outOfSpace {
+                ReviewPrompter.requestIfAppropriate()
+            }
         }
     }
 

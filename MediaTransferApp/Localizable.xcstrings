@@ -1,6 +1,227 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "\n…and %lld more" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\n…and %lld more"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\n…en nog %lld"
+          }
+        }
+      }
+    },
+    "(%@)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%@)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%@)"
+          }
+        }
+      }
+    },
+    "(%lld photos, %lld videos)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%lld photos, %lld videos)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%1$lld foto's, %2$lld video's)"
+          }
+        }
+      }
+    },
+    "%lld / %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld / %lld"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld / %lld"
+          }
+        }
+      }
+    },
+    "%lld photos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld photos"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld foto's"
+          }
+        }
+      }
+    },
+    "%lld Photos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Photos"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld foto's"
+          }
+        }
+      }
+    },
+    "%lld videos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld videos"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld video's"
+          }
+        }
+      }
+    },
+    "%lld Videos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Videos"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld video's"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
+    },
+    "About" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over"
+          }
+        }
+      }
+    },
+    "All %lld item(s) copied successfully." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All %lld item(s) copied successfully."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle %lld item(s) succesvol gekopieerd."
+          }
+        }
+      }
+    },
+    "All Items" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Items"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle items"
+          }
+        }
+      }
+    },
+    "Any USB-C drive works" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any USB-C drive works"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werkt met elke USB-C schijf"
+          }
+        }
+      }
+    },
     "Automatically delete after transfer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17,6 +238,10 @@
           }
         }
       }
+    },
+    "BOLD700" : {
+      "comment" : "The name of the app's developer.",
+      "isCommentAutoGenerated" : true
     },
     "Cancel" : {
       "extractionState" : "manual",
@@ -52,6 +277,126 @@
         }
       }
     },
+    "Connect a stick, SSD or hard drive. Back up in seconds." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect a stick, SSD or hard drive. Back up in seconds."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sluit een stick, SSD of harde schijf aan. Back-up in seconden."
+          }
+        }
+      }
+    },
+    "Contact Support" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Support"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact opnemen"
+          }
+        }
+      }
+    },
+    "Copied %lld item(s). Failed:\n%@%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied %1$lld item(s). Failed:\n%2$@%3$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld item(s) gekopieerd. Mislukt:\n%2$@%3$@"
+          }
+        }
+      }
+    },
+    "Copy first, then auto-delete from your phone if you want." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy first, then auto-delete from your phone if you want."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eerst kopiëren, daarna automatisch verwijderen van je telefoon als je dat wilt."
+          }
+        }
+      }
+    },
+    "Deselect All" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselecteer alles"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gereed"
+          }
+        }
+      }
+    },
+    "Done (%lld)" : {
+      "comment" : "Done with selection count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done (%lld)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gereed (%lld)"
+          }
+        }
+      }
+    },
     "Error" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -65,6 +410,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fout"
+          }
+        }
+      }
+    },
+    "Favorites" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorieten"
+          }
+        }
+      }
+    },
+    "Free up space, safely" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free up space, safely"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maak veilig ruimte vrij"
+          }
+        }
+      }
+    },
+    "Get Started" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aan de slag"
+          }
+        }
+      }
+    },
+    "Items transferred" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items transferred"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items overgezet"
+          }
+        }
+      }
+    },
+    "Keep this app open until finished" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep this app open until finished"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Houd de app open tot voltooid"
+          }
+        }
+      }
+    },
+    "Made by" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Made by"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemaakt door"
+          }
+        }
+      }
+    },
+    "Manage" : {
+      "comment" : "Manage limited photo access",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beheer"
           }
         }
       }
@@ -103,6 +568,23 @@
         }
       }
     },
+    "Next" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volgende"
+          }
+        }
+      }
+    },
     "No access to selected folder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -116,6 +598,58 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Geen toegang tot de geselecteerde map"
+          }
+        }
+      }
+    },
+    "No cloud. No account. Nothing leaves your iPhone." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cloud. No account. Nothing leaves your iPhone."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen cloud. Geen account. Niets verlaat je iPhone."
+          }
+        }
+      }
+    },
+    "No items match this filter" : {
+      "comment" : "Empty state in picker",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No items match this filter"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen items voor dit filter"
+          }
+        }
+      }
+    },
+    "No media" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No media"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen media"
           }
         }
       }
@@ -154,6 +688,92 @@
         }
       }
     },
+    "Open Settings" : {
+      "comment" : "Open the system Settings app",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Instellingen"
+          }
+        }
+      }
+    },
+    "Photo access required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo access required"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegang tot foto's vereist"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto's"
+          }
+        }
+      }
+    },
+    "Privacy Policy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacybeleid"
+          }
+        }
+      }
+    },
+    "Rate this App" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate this App"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beoordeel deze app"
+          }
+        }
+      }
+    },
     "Save to..." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -167,6 +787,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opslaan op..."
+          }
+        }
+      }
+    },
+    "Screenshots" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schermafbeeldingen"
+          }
+        }
+      }
+    },
+    "Select All" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecteer alles"
           }
         }
       }
@@ -188,6 +842,40 @@
         }
       }
     },
+    "selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selected"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "geselecteerd"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellingen"
+          }
+        }
+      }
+    },
     "Start Transfer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -201,6 +889,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start overdracht"
+          }
+        }
+      }
+    },
+    "Support" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ondersteuning"
+          }
+        }
+      }
+    },
+    "The destination doesn't have enough free space. %lld item(s) were copied before stopping." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The destination doesn't have enough free space. %lld item(s) were copied before stopping."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De bestemming heeft onvoldoende vrije ruimte. %lld item(s) zijn gekopieerd voordat we stopten."
+          }
+        }
+      }
+    },
+    "To select media, please allow Photo access in Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To select media, please allow Photo access in Settings."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sta toegang tot foto's toe in Instellingen om media te kunnen selecteren."
+          }
+        }
+      }
+    },
+    "Transfer cancelled. %lld item(s) copied." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer cancelled. %lld item(s) copied."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overdracht geannuleerd. %lld item(s) gekopieerd."
           }
         }
       }
@@ -245,7 +1001,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transferring..."
+            "value" : "Bezig met overdracht..."
           }
         },
         "nl" : {
@@ -256,193 +1012,109 @@
         }
       }
     },
-    "(%lld photos, %lld videos)" : {
+    "Transfers completed" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(%lld photos, %lld videos)"
+            "value" : "Transfers completed"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(%1$lld foto's, %2$lld video's)"
+            "value" : "Voltooide overdrachten"
           }
         }
       }
     },
-    "%lld Photos" : {
+    "Version" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld Photos"
+            "value" : "Version"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld foto's"
+            "value" : "Versie"
           }
         }
       }
     },
-    "%lld Videos" : {
+    "Videos" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld Videos"
+            "value" : "Videos"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld video's"
+            "value" : "Video's"
           }
         }
       }
     },
-    "(%@)" : {
+    "You've granted access to a limited set of photos." : {
+      "comment" : "Limited access banner",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(%@)"
+            "value" : "You've granted access to a limited set of photos."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(%@)"
+            "value" : "Je hebt toegang gegeven tot een beperkte set foto's."
           }
         }
       }
     },
-    "%lld / %lld" : {
+    "Your activity" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld / %lld"
+            "value" : "Your activity"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld / %lld"
+            "value" : "Jouw activiteit"
           }
         }
       }
     },
-    "%lld%%" : {
+    "Your photos stay yours" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld%%"
+            "value" : "Your photos stay yours"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld%%"
-          }
-        }
-      }
-    },
-    "All %lld item(s) copied successfully." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All %lld item(s) copied successfully."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle %lld item(s) succesvol gekopieerd."
-          }
-        }
-      }
-    },
-    "Transfer cancelled. %lld item(s) copied." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transfer cancelled. %lld item(s) copied."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overdracht geannuleerd. %lld item(s) gekopieerd."
-          }
-        }
-      }
-    },
-    "The destination doesn't have enough free space. %lld item(s) were copied before stopping." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The destination doesn't have enough free space. %lld item(s) were copied before stopping."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De bestemming heeft onvoldoende vrije ruimte. %lld item(s) zijn gekopieerd voordat we stopten."
-          }
-        }
-      }
-    },
-    "Copied %lld item(s). Failed:\n%@%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copied %1$lld item(s). Failed:\n%2$@%3$@"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld item(s) gekopieerd. Mislukt:\n%2$@%3$@"
-          }
-        }
-      }
-    },
-    "\n…and %lld more" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\n…and %lld more"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\n…en nog %lld"
+            "value" : "Jouw foto's blijven van jou"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }
