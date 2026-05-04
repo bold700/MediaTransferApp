@@ -5,17 +5,6 @@ import AVFoundation
 import UIKit
 import UserNotifications
 
-// MARK: - Constants
-private enum Constants {
-    static let progressViewHeight: CGFloat = 100
-    static let buttonCornerRadius: CGFloat = 10
-    static let buttonStrokeWidth: CGFloat = 1
-    static let buttonOpacity: Double = 0.1
-    static let minButtonWidth: CGFloat = 280
-    static let maxButtonWidth: CGFloat = 500
-    static let appBlue = Color(red: 0.0, green: 0.478, blue: 1.0) // #007AFF
-}
-
 // MARK: - Transfer Controller
 @MainActor
 final class TransferController: ObservableObject {
@@ -58,9 +47,7 @@ final class TransferController: ObservableObject {
         }
     }
 
-    func cancel() {
-        task?.cancel()
-    }
+    func cancel() { task?.cancel() }
 
     private func beginBackgroundTask() {
         endBackgroundTask()
@@ -105,12 +92,11 @@ final class TransferController: ObservableObject {
     }
 
     private static let batchSize = 50
-    private static let batchPauseNanos: UInt64 = 200_000_000 // 200ms
+    private static let batchPauseNanos: UInt64 = 200_000_000
 
     private func run(assets: [PHAsset], destination: URL, deleteAfter: Bool) async -> Outcome {
         var outcome = Outcome()
 
-        // Pre-flight free space check (best-effort).
         if let needed = totalEstimatedSize(of: assets),
            let free = freeSpace(at: destination),
            needed > free {
@@ -166,7 +152,6 @@ final class TransferController: ObservableObject {
                 await Task.yield()
             }
 
-            // Adempauze tussen batches zodat iOS Photos-service niet overweldigd raakt
             if !stop && !Task.isCancelled && batch.count == Self.batchSize {
                 try? await Task.sleep(nanoseconds: Self.batchPauseNanos)
             }
@@ -181,7 +166,6 @@ final class TransferController: ObservableObject {
         return outcome
     }
 
-    // MARK: - Helpers
     private func fileURL(for asset: PHAsset) async -> URL? {
         await withCheckedContinuation { continuation in
             if asset.mediaType == .video {
@@ -233,7 +217,7 @@ final class TransferController: ObservableObject {
     }
 }
 
-// MARK: - App State
+// MARK: - App State (security-scoped folder)
 final class AppState: ObservableObject {
     @Published var selectedDirectory: URL? {
         didSet {
@@ -264,33 +248,34 @@ final class AppState: ObservableObject {
         }
     }
 
-    deinit {
-        stopAccess()
-    }
+    deinit { stopAccess() }
 }
 
 // MARK: - Splash Screen
 private struct SplashScreen: View {
     @State private var isRotating = false
     @Binding var isVisible: Bool
+    private let appBlue = Color(red: 0, green: 0.478, blue: 1.0)
 
     var body: some View {
         ZStack {
-            Constants.appBlue
-                .ignoresSafeArea()
-
-            VStack(spacing: 11) {
+            appBlue.ignoresSafeArea()
+            VStack(spacing: 16) {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 124, height: 124)
                     .foregroundColor(.white)
                     .rotationEffect(.degrees(isRotating ? 360 : 0))
-
-                Text("Media Transfer App")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
+                VStack(spacing: 8) {
+                    Text("USB Photo Transfer")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    Text("No cloud. No account.")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.85))
+                }
             }
         }
         .onAppear {
@@ -298,42 +283,16 @@ private struct SplashScreen: View {
                 isRotating = true
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
-                    isVisible = false
-                }
+                withAnimation { isVisible = false }
             }
         }
     }
 }
 
-// MARK: - Content View
+// MARK: - Root
 struct ContentView: View {
-    @StateObject private var appState = AppState()
-    @StateObject private var transfer = TransferController()
-    @State private var selectedAssets: [PHAsset] = []
-    @State private var showImagePicker = false
-    @State private var showDirectoryPicker = false
-    @State private var shouldDeleteAfterTransfer = false
     @State private var showSplashScreen = true
-    @State private var resultAlert: ResultAlert?
-    @State private var showError = false
-    @State private var errorMessage = ""
-    @State private var showPhotoPermissionAlert = false
-    @State private var showSettings = false
     @State private var hasSeenOnboarding: Bool = UserStats.hasSeenOnboarding
-
-    private struct ResultAlert: Identifiable {
-        let id = UUID()
-        let title: String
-        let message: String
-        let resetSelection: Bool
-    }
-
-    private var selectedMediaCount: (photos: Int, videos: Int) {
-        let photos = selectedAssets.filter { $0.mediaType == .image }.count
-        let videos = selectedAssets.filter { $0.mediaType == .video }.count
-        return (photos, videos)
-    }
 
     var body: some View {
         ZStack {
@@ -345,334 +304,9 @@ struct ContentView: View {
                     withAnimation { hasSeenOnboarding = true }
                 }
             } else {
-                mainView
+                MediaPickerView()
             }
         }
-    }
-
-    private var mainView: some View {
-        GeometryReader { geometry in
-            NavigationStack {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        Spacer()
-
-                        VStack(spacing: 20) {
-                            headerView
-                                .padding(.top, 20)
-                                .padding(.bottom, 16)
-
-                            mediaSelectionButton
-                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            if !selectedAssets.isEmpty {
-                                selectedAssetsListView
-                                    .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            }
-                            directorySelectionButton
-                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            transferButton
-                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            deleteToggle
-                                .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-
-                            if transfer.isTransferring {
-                                transferProgressView
-                                    .frame(maxWidth: min(Constants.maxButtonWidth, geometry.size.width * 0.9))
-                            }
-                        }
-                        .padding(.horizontal)
-
-                        Spacer()
-                    }
-                    .frame(minHeight: geometry.size.height)
-                    .frame(maxWidth: .infinity)
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: { showSettings = true }) {
-                            Image(systemName: "gear")
-                        }
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedAssets: $selectedAssets)
-        }
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-        }
-        .fileImporter(
-            isPresented: $showDirectoryPicker,
-            allowedContentTypes: [.folder],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    appState.selectedDirectory = url
-                }
-            case .failure(let error):
-                errorMessage = error.localizedDescription
-                showError = true
-            }
-        }
-        .alert(item: $resultAlert) { alert in
-            Alert(
-                title: Text(alert.title),
-                message: Text(alert.message),
-                dismissButton: .default(Text("OK")) {
-                    if alert.resetSelection {
-                        selectedAssets = []
-                    }
-                }
-            )
-        }
-        .alert("Error", isPresented: $showError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(errorMessage)
-        }
-        .alert("Photo access required", isPresented: $showPhotoPermissionAlert) {
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("To select media, please allow Photo access in Settings.")
-        }
-    }
-
-    // MARK: - View Components
-    private var headerView: some View {
-        Text("Media Transfer")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-    }
-
-    private var mediaSelectionButton: some View {
-        Button(action: requestPhotoAccess) {
-            HStack {
-                Image(systemName: "photo.on.rectangle")
-                Text("Select Media")
-                if !selectedAssets.isEmpty {
-                    Text("(\(selectedMediaCount.photos) photos, \(selectedMediaCount.videos) videos)")
-                        .foregroundColor(.secondary)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Constants.appBlue.opacity(Constants.buttonOpacity))
-            .foregroundColor(Constants.appBlue)
-            .overlay(
-                RoundedRectangle(cornerRadius: Constants.buttonCornerRadius)
-                    .stroke(Constants.appBlue, lineWidth: Constants.buttonStrokeWidth)
-            )
-            .cornerRadius(Constants.buttonCornerRadius)
-        }
-        .disabled(transfer.isTransferring)
-    }
-
-    private var selectedAssetsListView: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            if selectedMediaCount.photos > 0 {
-                HStack {
-                    Image(systemName: "photo.fill")
-                        .foregroundColor(Constants.appBlue)
-                    Text("\(selectedMediaCount.photos) Photos")
-                        .foregroundColor(.primary)
-                }
-            }
-            if selectedMediaCount.videos > 0 {
-                HStack {
-                    Image(systemName: "video.fill")
-                        .foregroundColor(Constants.appBlue)
-                    Text("\(selectedMediaCount.videos) Videos")
-                        .foregroundColor(.primary)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(UIColor.systemBackground).opacity(0.1))
-        .cornerRadius(Constants.buttonCornerRadius)
-    }
-
-    private var directorySelectionButton: some View {
-        Button(action: {
-            showDirectoryPicker = true
-        }) {
-            HStack {
-                Image(systemName: "folder.badge.plus")
-                Text("Save to...")
-                if let directory = appState.selectedDirectory {
-                    Text("(\(directory.lastPathComponent))")
-                        .foregroundColor(.secondary)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Constants.appBlue.opacity(Constants.buttonOpacity))
-            .foregroundColor(Constants.appBlue)
-            .overlay(
-                RoundedRectangle(cornerRadius: Constants.buttonCornerRadius)
-                    .stroke(Constants.appBlue, lineWidth: Constants.buttonStrokeWidth)
-            )
-            .cornerRadius(Constants.buttonCornerRadius)
-        }
-        .disabled(transfer.isTransferring)
-    }
-
-    private var transferButton: some View {
-        Button(action: startTransfer) {
-            HStack {
-                Image(systemName: "arrow.right.circle.fill")
-                Text("Start Transfer")
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(canTransfer ? Constants.appBlue : Color.gray)
-            .foregroundColor(.white)
-            .cornerRadius(Constants.buttonCornerRadius)
-        }
-        .disabled(!canTransfer)
-    }
-
-    private var deleteToggle: some View {
-        Toggle("Automatically delete after transfer", isOn: $shouldDeleteAfterTransfer)
-            .padding(.horizontal)
-            .tint(Constants.appBlue)
-            .disabled(transfer.isTransferring)
-    }
-
-    private var transferProgressView: some View {
-        VStack(spacing: 10) {
-            HStack {
-                Text("Transferring...")
-                Spacer()
-                Text("\(transfer.completed) / \(transfer.total)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            HStack(spacing: 6) {
-                Image(systemName: "info.circle")
-                    .font(.caption2)
-                Text("Keep this app open until finished")
-                    .font(.caption2)
-            }
-            .foregroundColor(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            ProgressView(value: transfer.progress)
-                .progressViewStyle(LinearProgressViewStyle(tint: Constants.appBlue))
-                .frame(height: 10)
-            if !transfer.currentFileName.isEmpty {
-                Text(transfer.currentFileName)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            HStack {
-                Text("\(Int(transfer.progress * 100))%")
-                    .font(.caption)
-                Spacer()
-                Button(role: .destructive) {
-                    transfer.cancel()
-                } label: {
-                    Text("Cancel")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                }
-            }
-        }
-        .padding()
-        .background(Constants.appBlue.opacity(0.05))
-        .cornerRadius(Constants.buttonCornerRadius)
-    }
-
-    // MARK: - Helper Functions
-    private func requestPhotoAccess() {
-        let current = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        switch current {
-        case .authorized, .limited:
-            showImagePicker = true
-        case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                DispatchQueue.main.async {
-                    if status == .authorized || status == .limited {
-                        showImagePicker = true
-                    } else {
-                        showPhotoPermissionAlert = true
-                    }
-                }
-            }
-        case .denied, .restricted:
-            showPhotoPermissionAlert = true
-        @unknown default:
-            showPhotoPermissionAlert = true
-        }
-    }
-
-    private func startTransfer() {
-        guard let destinationURL = appState.selectedDirectory else { return }
-
-        guard appState.requestAccess() else {
-            errorMessage = "No access to selected folder"
-            showError = true
-            return
-        }
-
-        transfer.start(
-            assets: selectedAssets,
-            destination: destinationURL,
-            deleteAfter: shouldDeleteAfterTransfer
-        ) { outcome in
-            if outcome.succeeded > 0 {
-                UserStats.recordTransfer(succeededItems: outcome.succeeded)
-            }
-            self.resultAlert = makeAlert(for: outcome)
-            if outcome.failed.isEmpty && !outcome.cancelled && !outcome.outOfSpace {
-                ReviewPrompter.requestIfAppropriate()
-            }
-        }
-    }
-
-    private func makeAlert(for outcome: TransferController.Outcome) -> ResultAlert {
-        if outcome.outOfSpace {
-            return ResultAlert(
-                title: "Not enough space",
-                message: "The destination doesn't have enough free space. \(outcome.succeeded) item(s) were copied before stopping.",
-                resetSelection: false
-            )
-        }
-        if outcome.cancelled {
-            return ResultAlert(
-                title: "Cancelled",
-                message: "Transfer cancelled. \(outcome.succeeded) item(s) copied.",
-                resetSelection: false
-            )
-        }
-        if !outcome.failed.isEmpty {
-            let preview = outcome.failed.prefix(5).joined(separator: "\n")
-            let extra = outcome.failed.count > 5 ? "\n…and \(outcome.failed.count - 5) more" : ""
-            return ResultAlert(
-                title: "Transfer completed with errors",
-                message: "Copied \(outcome.succeeded) item(s). Failed:\n\(preview)\(extra)",
-                resetSelection: outcome.succeeded > 0
-            )
-        }
-        return ResultAlert(
-            title: "Transfer completed",
-            message: "All \(outcome.succeeded) item(s) copied successfully.",
-            resetSelection: true
-        )
-    }
-
-    private var canTransfer: Bool {
-        !selectedAssets.isEmpty && appState.selectedDirectory != nil && !transfer.isTransferring
     }
 }
 
