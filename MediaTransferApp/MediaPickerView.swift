@@ -25,9 +25,9 @@ struct MediaPickerView: View {
     }
 
     var body: some View {
-        ZStack {
+        Group {
             if library.isAuthorized {
-                authorizedContent
+                authorizedView
             } else {
                 permissionGate
             }
@@ -77,30 +77,72 @@ struct MediaPickerView: View {
         }
     }
 
-    // MARK: - Authorized layout
-    private var authorizedContent: some View {
-        GeometryReader { geo in
-            let topUI: CGFloat = library.isLimited ? 175 : 138
-            let bottomUI: CGFloat = transfer.isTransferring ? 200 : 220
-            let topInset = geo.safeAreaInsets.top + topUI
-            let bottomInset = geo.safeAreaInsets.bottom + bottomUI
-
-            ZStack(alignment: .top) {
-                MediaGridView(
-                    library: library,
-                    transferring: transfer.isTransferring,
-                    topInset: topInset,
-                    bottomInset: bottomInset
-                )
-                    .ignoresSafeArea()
-
-                topOverlay
-                    .frame(maxWidth: .infinity, alignment: .top)
-
-                VStack(spacing: 0) {
-                    Spacer()
-                    bottomOverlay
+    // MARK: - Authorized layout (NavigationStack + system toolbar = automatic Liquid Glass)
+    private var authorizedView: some View {
+        NavigationStack {
+            MediaGridView(library: library, transferring: transfer.isTransferring)
+                .ignoresSafeArea()
+                .modifier(ScrollEdgeEffectModifier())
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    filterBar
                 }
+                .navigationTitle("Select Media")
+                .modifier(NavSubtitleModifier(text: countLabel))
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel("Settings")
+                    }
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    bottomBar
+                }
+        }
+    }
+
+    // MARK: - Filter bar
+    @ViewBuilder
+    private var filterBar: some View {
+        if #available(iOS 26.0, *) {
+            GlassFilterCapsule(filter: $library.filter)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+        } else {
+            Picker("Filter", selection: $library.filter) {
+                ForEach(PhotoLibrary.Filter.allCases) { f in
+                    Text(f.title).tag(f)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color(uiColor: .systemBackground))
+        }
+    }
+
+    // Use native .navigationSubtitle on iOS 26+, no-op on older versions.
+    private struct NavSubtitleModifier: ViewModifier {
+        let text: String
+        func body(content: Content) -> some View {
+            if #available(iOS 26.0, *) {
+                content.navigationSubtitle(text)
+            } else {
+                content
+            }
+        }
+    }
+
+    // Apple's scroll edge effect: subtle fade behind the nav bar/filter so titles stay legible.
+    private struct ScrollEdgeEffectModifier: ViewModifier {
+        func body(content: Content) -> some View {
+            if #available(iOS 26.0, *) {
+                content.scrollEdgeEffectStyle(.soft, for: .top)
+            } else {
+                content
             }
         }
     }
@@ -130,97 +172,13 @@ struct MediaPickerView: View {
             } label: {
                 Text("Allow Access")
                     .font(.headline)
-                    .foregroundColor(.white)
                     .frame(maxWidth: 320)
                     .padding()
-                    .background(appBlue)
-                    .cornerRadius(12)
             }
+            .buttonStyle(.borderedProminent)
+            .tint(appBlue)
         }
         .padding()
-    }
-
-    // MARK: - Top overlay
-    private var topOverlay: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Select Media")
-                        .font(.title.bold())
-                        .foregroundColor(.white)
-                    Text(countLabel)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.85))
-                        .monospacedDigit()
-                }
-                Spacer()
-                Button {
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                        .frame(width: 36, height: 36)
-                        .background(Color.white.opacity(0.2))
-                        .clipShape(Circle())
-                }
-                .accessibilityLabel("Settings")
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 12)
-
-            Picker("Filter", selection: $library.filter) {
-                ForEach(PhotoLibrary.Filter.allCases) { f in
-                    Text(f.title).tag(f)
-                }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 12)
-
-            if library.isLimited {
-                limitedBanner
-            }
-        }
-        .background {
-            LinearGradient(
-                stops: [
-                    .init(color: Color.black.opacity(0.85), location: 0.0),
-                    .init(color: Color.black.opacity(0.85), location: 0.65),
-                    .init(color: Color.black.opacity(0.5),  location: 0.85),
-                    .init(color: Color.clear,               location: 1.0)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-            .allowsHitTesting(false)
-        }
-    }
-
-    private var limitedBanner: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "info.circle")
-                .foregroundColor(.secondary)
-            Text("You've granted access to a limited set of photos.")
-                .font(.footnote)
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-            Spacer()
-            Button {
-                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let root = scene.windows.first?.rootViewController {
-                    library.presentLimitedPicker(from: root)
-                }
-            } label: {
-                Text("Manage")
-                    .font(.footnote.weight(.semibold))
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(Color(uiColor: .secondarySystemBackground))
     }
 
     private var countLabel: String {
@@ -231,42 +189,22 @@ struct MediaPickerView: View {
         return String(format: NSLocalizedString("%lld items", comment: "total items"), library.totalCount)
     }
 
-    // MARK: - Bottom overlay
-    private var bottomOverlay: some View {
-        VStack(spacing: 0) {
+    // MARK: - Bottom bar (system safe area inset = Liquid Glass on iOS 26)
+    private var bottomBar: some View {
+        VStack(spacing: 12) {
             if transfer.isTransferring {
                 progressCard
-                    .padding(.horizontal, 16)
-                    .padding(.top, 24)
-                    .padding(.bottom, 12)
             } else {
-                groupedList
-                    .padding(.horizontal, 16)
-                    .padding(.top, 24)
+                actionsCard
                 primaryButton
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 12)
             }
         }
-        .background {
-            LinearGradient(
-                colors: [
-                    Color.clear,
-                    Color.black.opacity(0.25),
-                    Color.black.opacity(0.55),
-                    Color.black.opacity(0.85),
-                    Color.black.opacity(0.95)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .bottom)
-            .allowsHitTesting(false)
-        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
     }
 
-    private var groupedList: some View {
+    private var actionsCard: some View {
         VStack(spacing: 0) {
             Button {
                 showDirectoryPicker = true
@@ -275,6 +213,7 @@ struct MediaPickerView: View {
                     Image(systemName: "folder")
                         .foregroundColor(appBlue)
                     Text("Save to")
+                        .foregroundColor(.primary)
                     Spacer()
                     if let dir = appState.selectedDirectory {
                         Text(dir.lastPathComponent)
@@ -292,7 +231,6 @@ struct MediaPickerView: View {
                 .padding(.vertical, 12)
                 .contentShape(Rectangle())
             }
-            .foregroundColor(.primary)
 
             Divider().padding(.leading, 16)
 
@@ -307,21 +245,42 @@ struct MediaPickerView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .cornerRadius(12)
+        .background {
+            if #available(iOS 26.0, *) {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(.regularMaterial)
+            } else {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
+            }
+        }
     }
 
+    @ViewBuilder
     private var primaryButton: some View {
-        Button(action: startTransfer) {
-            Text("Start Transfer")
-                .font(.headline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(canTransfer ? appBlue : Color.gray.opacity(0.4))
-                .cornerRadius(12)
+        if #available(iOS 26.0, *) {
+            Button(action: startTransfer) {
+                Text("Start Transfer")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+            }
+            .buttonStyle(.glassProminent)
+            .tint(appBlue)
+            .controlSize(.large)
+            .disabled(!canTransfer)
+        } else {
+            Button(action: startTransfer) {
+                Text("Start Transfer")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(canTransfer ? appBlue : Color.gray.opacity(0.4))
+                    .cornerRadius(12)
+            }
+            .disabled(!canTransfer)
         }
-        .disabled(!canTransfer)
     }
 
     private var progressCard: some View {
@@ -362,8 +321,15 @@ struct MediaPickerView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(14)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .cornerRadius(12)
+        .background {
+            if #available(iOS 26.0, *) {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(.regularMaterial)
+            } else {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
+            }
+        }
     }
 
     // MARK: - Logic
@@ -428,4 +394,42 @@ struct MediaPickerView: View {
 
 #Preview {
     MediaPickerView()
+}
+
+// MARK: - Glass Filter Capsule (iOS 26+)
+@available(iOS 26.0, *)
+private struct GlassFilterCapsule: View {
+    @Binding var filter: PhotoLibrary.Filter
+    @Namespace private var ns
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(PhotoLibrary.Filter.allCases) { f in
+                let isSelected = filter == f
+                Button {
+                    UISelectionFeedbackGenerator().selectionChanged()
+                    withAnimation(.smooth(duration: 0.3, extraBounce: 0.2)) {
+                        filter = f
+                    }
+                } label: {
+                    Text(f.title)
+                        .font(.subheadline.weight(isSelected ? .semibold : .regular))
+                        .foregroundStyle(isSelected ? Color.primary : Color.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background {
+                            if isSelected {
+                                Capsule()
+                                    .fill(.regularMaterial)
+                                    .matchedGeometryEffect(id: "selectedFilter", in: ns)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(4)
+        .glassEffect(.regular, in: Capsule())
+    }
 }
