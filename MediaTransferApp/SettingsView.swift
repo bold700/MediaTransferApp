@@ -4,7 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let appBlue = Color(red: 0, green: 0.478, blue: 1.0)
-    private let privacyURL = URL(string: "https://bold700.com/privacy")!
+    private let privacyURL = URL(string: "https://bold700.github.io/privacy/")!
     private let supportURL = URL(string: "mailto:support@bold700.com")!
     // TODO: vervang door je echte App Store ID na publicatie van 1.3.0
     private let appStoreReviewURL = URL(string: "itms-apps://itunes.apple.com/app/id6741049924?action=write-review")!

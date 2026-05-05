@@ -26,7 +26,15 @@ final class PhotoLibrary: NSObject, ObservableObject, PHPhotoLibraryChangeObserv
 
     @Published private(set) var assets: PHFetchResult<PHAsset>?
     @Published private(set) var totalCount: Int = 0
-    @Published var filter: Filter = .all { didSet { reload() } }
+    @Published var filter: Filter = .all {
+        didSet {
+            // Defer reload so UI transition (matchedGeometryEffect) can start first.
+            Task { @MainActor [weak self] in
+                await Task.yield()
+                self?.reload()
+            }
+        }
+    }
     @Published private(set) var authStatus: PHAuthorizationStatus
     @Published private(set) var selectedIdentifiers: [String] = []
 

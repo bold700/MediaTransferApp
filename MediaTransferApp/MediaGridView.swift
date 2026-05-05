@@ -7,8 +7,6 @@ struct MediaGridView: UIViewRepresentable {
     var transferring: Bool = false
     let columns: Int = 4
     let spacing: CGFloat = 1
-    let topInset: CGFloat
-    let bottomInset: CGFloat
 
     func makeCoordinator() -> Coordinator {
         Coordinator(library: library, columns: columns, spacing: spacing)
@@ -23,9 +21,7 @@ struct MediaGridView: UIViewRepresentable {
         cv.backgroundColor = .systemBackground
         cv.alwaysBounceVertical = true
         cv.allowsMultipleSelection = true
-        cv.contentInsetAdjustmentBehavior = .never
-        cv.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
-        cv.scrollIndicatorInsets = cv.contentInset
+        cv.contentInsetAdjustmentBehavior = .always
         cv.showsVerticalScrollIndicator = false
 
         cv.register(MediaCell.self, forCellWithReuseIdentifier: MediaCell.reuseId)
@@ -46,7 +42,7 @@ struct MediaGridView: UIViewRepresentable {
     }
 
     func updateUIView(_ cv: UICollectionView, context: Context) {
-        context.coordinator.update(library: library, topInset: topInset, bottomInset: bottomInset)
+        context.coordinator.update(library: library)
         cv.allowsSelection = !transferring
         context.coordinator.panGesture?.isEnabled = !transferring
     }
@@ -62,8 +58,6 @@ struct MediaGridView: UIViewRepresentable {
         let spacing: CGFloat
         private var lastAssetsId: ObjectIdentifier?
         private var lastSelectionCount: Int = -1
-        private var lastTopInset: CGFloat = 0
-        private var lastBottomInset: CGFloat = 0
 
         // Pan-select state
         private var dragMode: Bool? = nil
@@ -77,26 +71,15 @@ struct MediaGridView: UIViewRepresentable {
             super.init()
         }
 
-        func update(library: PhotoLibrary, topInset: CGFloat, bottomInset: CGFloat) {
+        func update(library: PhotoLibrary) {
             self.library = library
             guard let cv = collectionView else { return }
-
-            if topInset != lastTopInset || bottomInset != lastBottomInset {
-                let wasAtTop = cv.contentOffset.y <= -cv.contentInset.top + 1
-                cv.contentInset = UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
-                cv.scrollIndicatorInsets = cv.contentInset
-                if wasAtTop {
-                    cv.contentOffset = CGPoint(x: 0, y: -topInset)
-                }
-                lastTopInset = topInset
-                lastBottomInset = bottomInset
-            }
 
             let currentId = library.assets.map { ObjectIdentifier($0) }
             if currentId != lastAssetsId {
                 lastAssetsId = currentId
                 cv.reloadData()
-                cv.setContentOffset(CGPoint(x: 0, y: -topInset), animated: false)
+                cv.setContentOffset(CGPoint(x: 0, y: -cv.adjustedContentInset.top), animated: false)
                 applySelection(in: cv)
             } else if library.selectedIdentifiers.count != lastSelectionCount {
                 applySelection(in: cv)
